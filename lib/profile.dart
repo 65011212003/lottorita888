@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:lottorita888/home.dart';
+import 'package:lottorita888/reward.dart';
+import 'package:lottorita888/safe.dart';
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +27,7 @@ class ProfilePage extends StatelessWidget {
                     child: _buildProfileCard(),
                   ),
                 ),
-                _buildBottomNavBar(),
+                _buildBottomNavBar(context),
               ],
             ),
           ),
@@ -80,16 +85,16 @@ class ProfilePage extends StatelessWidget {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {},
-                  child: const Text('แก้ไข'),
                   style: ElevatedButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Colors.grey[300]),
+                  child: const Text('แก้ไข'),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {},
-                  child: const Text('ฝากเงิน'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                  child: const Text('ฝากเงิน'),
                 ),
               ),
             ],
@@ -97,8 +102,8 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {},
-            child: const Text('ออกจากระบบ'),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('ออกจากระบบ'),
           ),
         ],
       ),
@@ -120,30 +125,46 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
     return Container(
       color: Colors.amber,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home, 'หวย'),
-            _buildNavItem(Icons.emoji_events, 'รางวัล'),
-            _buildNavItem(Icons.person, 'ดูโพย'),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(context, Icons.calendar_today, 'หวย', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }),
+          _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RewardPage()),
+            );
+          }),
+          _buildNavItem(context, Icons.person, 'บัญชี', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SafePage()),
+            );
+          }),
+        ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon),
-        Text(label),
-      ],
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon),
+          Text(label),
+        ],
+      ),
     );
   }
 }

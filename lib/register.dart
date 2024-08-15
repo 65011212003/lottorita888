@@ -3,38 +3,60 @@ import 'dart:ui';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _phone = '';
-  String _password = '';
-  String _confirmPassword = '';
-  int _wallet = 0;
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _walletController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _walletController.dispose();
+    super.dispose();
+  }
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      if (_password != _confirmPassword) {
+      if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('รหัสผ่านไม่ตรงกัน')),
         );
         return;
       }
+
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
-        final result = await ApiService.register(_username, _password, _wallet);
+        final result = await ApiService.register(
+          _usernameController.text,
+          _passwordController.text,
+          int.parse(_walletController.text),
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
         );
-        // Navigate to login screen or home screen
         Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('สมัครสมาชิกไม่สำเร็จ: $e')),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -100,40 +122,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 20),
                               _buildTextField(
-                                  'ชื่อผู้ใช้', (value) => _username = value),
-                              const SizedBox(height: 10),
-                              _buildTextField('ชื่อ / เบอร์โทรศัพท์',
-                                  (value) => _phone = value),
-                              const SizedBox(height: 10),
-                              _buildTextField(
-                                  'Wallet', (value) => _wallet = value as int),
+                                'ชื่อผู้ใช้',
+                                _usernameController,
+                              ),
                               const SizedBox(height: 10),
                               _buildTextField(
-                                  'รหัสผ่าน', (value) => _password = value,
-                                  isPassword: true),
+                                'Wallet',
+                                _walletController,
+                                keyboardType: TextInputType.number,
+                              ),
                               const SizedBox(height: 10),
-                              _buildTextField('ยืนยันรหัสผ่าน',
-                                  (value) => _confirmPassword = value,
-                                  isPassword: true),
+                              _buildTextField(
+                                'รหัสผ่าน',
+                                _passwordController,
+                                isPassword: true,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildTextField(
+                                'ยืนยันรหัสผ่าน',
+                                _confirmPasswordController,
+                                isPassword: true,
+                              ),
                               const SizedBox(height: 20),
                               ElevatedButton(
-                                child: const Text(
-                                  'สมัคร',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                onPressed: _register,
+                                onPressed: _isLoading ? null : _register,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.amber,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
+                                  padding: const EdgeInsets.symmetric(vertical: 15),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                 ),
+                                child: _isLoading
+                                    ? const CircularProgressIndicator()
+                                    : const Text(
+                                        'สมัคร',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                               ),
                               const SizedBox(height: 10),
                               TextButton(
@@ -160,8 +189,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(String hintText, Function(String) onSaved,
-      {bool isPassword = false}) {
+  Widget _buildTextField(
+    String hintText,
+    TextEditingController controller, {
+    bool isPassword = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -169,13 +202,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         border: Border.all(color: Colors.grey[300]!),
       ),
       child: TextFormField(
+        controller: controller,
         obscureText: isPassword,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[600]),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -183,7 +217,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
           return null;
         },
-        onSaved: (value) => onSaved(value!),
       ),
     );
   }

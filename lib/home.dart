@@ -1,11 +1,45 @@
 import 'package:flutter/material.dart';
+import 'services/api_service.dart';
+import 'reward.dart';
+import 'safe.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> lotteries = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLotteries();
+  }
+
+  Future<void> fetchLotteries() async {
+    try {
+      final fetchedLotteries = await ApiService.getLotteries();
+      setState(() {
+        lotteries = fetchedLotteries;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching lotteries: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/background.jpg'),
             fit: BoxFit.cover,
@@ -18,7 +52,7 @@ class HomePage extends StatelessWidget {
               _buildTitle(),
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -40,8 +74,8 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildAppBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -56,21 +90,27 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildTitle() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24.0),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 24.0),
       child: Column(
         children: [
-          Text('LOTTORITA 69', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-          Text('ชุดใหญ่ โอนไว จัดเต็ม พร้อมมิติ', style: TextStyle(color: Colors.white, fontSize: 18)),
-          Text('อันดีต ปัจจุบัน อนาคตครบ', style: TextStyle(color: Colors.white, fontSize: 14)),
+          Text('LOTTORITA 69',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold)),
+          Text('ชุดใหญ่ โอนไว จัดเต็ม พร้อมมิติ',
+              style: TextStyle(color: Colors.white, fontSize: 18)),
+          Text('อันดีต ปัจจุบัน อนาคตครบ',
+              style: TextStyle(color: Colors.white, fontSize: 14)),
         ],
       ),
     );
   }
 
   Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
       child: Row(
         children: [
           Expanded(
@@ -90,12 +130,28 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLotteryList() {
+    if (isLoading) {
+      return const Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (lotteries.isEmpty) {
+      return const Expanded(
+        child: Center(
+            child: Text('No lotteries available',
+                style: TextStyle(color: Colors.white))),
+      );
+    }
+
     return Expanded(
       child: ListView.builder(
-        itemCount: 4,
+        itemCount: lotteries.length,
         itemBuilder: (context, index) {
+          final lottery = lotteries[index];
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -109,16 +165,20 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('6 8 2 1 8 4', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                          Text('Lottorita 888', style: TextStyle(color: Colors.black54)),
+                          Text(lottery['number'].toString(),
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold)),
+                          // ignore: prefer_const_constructors
+                          Text('Price: 100',
+                              style: const TextStyle(color: Colors.black54)),
                         ],
                       ),
                     ),
                   ),
                   Container(
                     color: Colors.black,
-                    padding: EdgeInsets.all(16),
-                    child: Icon(Icons.shopping_cart, color: Colors.white),
+                    padding: const EdgeInsets.all(16),
+                    child: const Icon(Icons.shopping_cart, color: Colors.white),
                   ),
                 ],
               ),
@@ -129,28 +189,46 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return Container(
-      color: Colors.amber,
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.calendar_today, 'หวย'),
-          _buildNavItem(Icons.emoji_events, 'รางวัล'),
-          _buildNavItem(Icons.person, 'บัญชี'),
-        ],
-      ),
-    );
-  }
+Widget _buildBottomNavBar() {
+  return Container(
+    color: Colors.amber,
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildNavItem(Icons.calendar_today, 'หวย', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }),
+        _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RewardPage()),
+          );
+        }),
+        _buildNavItem(Icons.person, 'บัญชี', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SafePage()),
+          );
+        }),
+      ],
+    ),
+  );
+}
 
-  Widget _buildNavItem(IconData icon, String label) {
-    return Column(
+Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon),
         Text(label),
       ],
-    );
-  }
+    ),
+  );
+}
 }

@@ -15,9 +15,11 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:lottorita888/reward.dart';
+import 'package:lottorita888/safe.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -132,22 +134,23 @@ class _SearchPageState extends State<SearchPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    child: const Text('สุ่มตัวเลข', style: TextStyle(fontSize: 16)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 230, 216, 93),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
+                    child: const Text('สุ่มตัวเลข',
+                        style: TextStyle(fontSize: 16)),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    child: const Text('ค้นหา', style: TextStyle(fontSize: 16)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
+                    child: const Text('ค้นหา', style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ],
@@ -161,7 +164,6 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildCategoryButton(String text, {bool isSelected = false}) {
     return ElevatedButton(
       onPressed: () {},
-      child: Text(text, style: const TextStyle(fontSize: 14)),
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected ? Colors.amber : Colors.grey[300],
         foregroundColor: isSelected ? Colors.white : Colors.black,
@@ -170,6 +172,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
         padding: const EdgeInsets.symmetric(vertical: 8),
       ),
+      child: Text(text, style: const TextStyle(fontSize: 14)),
     );
   }
 
@@ -224,96 +227,102 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _showPurchaseConfirmationDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'ยืนยันการซื้อ',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: Colors.grey),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.circular(10),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 300,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'ยืนยันการซื้อ',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Icon(Icons.close, color: Colors.grey),
+                    ),
+                  ],
                 ),
-                child: const Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        '6 8 2 1 8 4',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      Text('Lottorita 888', style: TextStyle(color: Colors.black54)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Credit'),
-                  Text('400.-', style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('จำนวน 1'),
-                  Text('-120.-', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-              const Divider(thickness: 1),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('ยอดคงเหลือ'),
-                  Text('280.-', style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                child: const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  child: const Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          '6 8 2 1 8 4',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        Text('Lottorita 888',
+                            style: TextStyle(color: Colors.black54)),
+                      ],
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  // Add purchase confirmation logic here
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                const SizedBox(height: 20),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Credit'),
+                    Text('400.-',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('จำนวน 1'),
+                    Text('-120.-', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+                const Divider(thickness: 1),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('ยอดคงเหลือ'),
+                    Text('280.-',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Add purchase confirmation logic here
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
+
   Widget _buildBottomNavBar() {
     return Container(
       color: Colors.amber,
@@ -321,21 +330,36 @@ class _SearchPageState extends State<SearchPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.calendar_today, 'หวย'),
-          _buildNavItem(Icons.emoji_events, 'รางวัล'),
-          _buildNavItem(Icons.person, 'บัญชี'),
+          _buildNavItem(Icons.calendar_today, 'หวย', () {
+            // Add navigation or action for 'หวย' if needed
+          }),
+          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RewardPage()),
+            );
+          }),
+          _buildNavItem(Icons.person, 'บัญชี', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SafePage()),
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon),
-        Text(label),
-      ],
+  Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon),
+          Text(label),
+        ],
+      ),
     );
   }
 }

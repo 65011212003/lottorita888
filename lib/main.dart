@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/home.dart';
-import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/reward.dart';
-import 'package:lottorita888/safe.dart';
-import 'package:lottorita888/search.dart';
 import 'dart:ui';
 import 'register.dart';
 import 'package:lottorita888/services/api_service.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,12 +20,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginScreen(),
+      home: const LoginScreen(),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       
       // If login is successful, navigate to the home screen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } catch (e) {
       // If login fails, show an error message
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: <Widget>[
                           TextField(
                             controller: _usernameController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'ชื่อผู้ใช้/เบอร์โทรศัพท์',
                             ),
                           ),
@@ -122,20 +123,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextField(
                             controller: _passwordController,
                             obscureText: true,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'รหัสผ่าน',
                             ),
                           ),
                           const SizedBox(height: 20),
                           ElevatedButton(
-                            child: _isLoading
-                                ? CircularProgressIndicator(color: Colors.black)
-                                : Text('เข้าสู่ระบบ'),
                             onPressed: _isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.black,
                               backgroundColor: Colors.amber,
                             ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(color: Colors.black)
+                                : const Text('เข้าสู่ระบบ'),
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -152,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => RegisterScreen()),
+                                    MaterialPageRoute(builder: (context) => const RegisterScreen()),
                                   );
                                 },
                               ),
@@ -234,7 +235,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 20),
                           ElevatedButton(
-                            child: const Text('เข้าสู่ระบบ'),
                             onPressed: () {
                               // Login logic here
                             },
@@ -242,6 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               foregroundColor: Colors.black,
                               backgroundColor: Colors.amber,
                             ),
+                            child: const Text('เข้าสู่ระบบ'),
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -258,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => RegisterScreen())) ;
+                                    MaterialPageRoute(builder: (context) => const RegisterScreen())) ;
                                 },
                               ),
                             ],

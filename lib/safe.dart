@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SafePage extends StatefulWidget {
-  const SafePage({Key? key}) : super(key: key);
+  const SafePage({super.key});
 
   @override
   _SafePageState createState() => _SafePageState();
