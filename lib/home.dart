@@ -17,7 +17,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> lotteries = [];
   bool isLoading = true;
+  bool isLoadingMore = false;
   Map<String, dynamic> userData = {};
+  int currentPage = 0;
+  final int itemsPerPage = 20;
+  bool hasMoreItems = true;
 
   @override
   void initState() {
@@ -26,17 +30,42 @@ class _HomePageState extends State<HomePage> {
     fetchUserData();
   }
 
-  Future<void> fetchLotteries() async {
-    try {
-      final fetchedLotteries = await ApiService.getLotteries();
+  Future<void> fetchLotteries({bool loadMore = false}) async {
+    if (loadMore) {
+      if (isLoadingMore || !hasMoreItems) return;
       setState(() {
-        lotteries = fetchedLotteries;
-        isLoading = false;
+        isLoadingMore = true;
+      });
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    try {
+      final fetchedLotteries = await ApiService.getLotteries(
+        skip: currentPage * itemsPerPage,
+        limit: itemsPerPage,
+      );
+      setState(() {
+        if (loadMore) {
+          lotteries.addAll(fetchedLotteries);
+          isLoadingMore = false;
+        } else {
+          lotteries = fetchedLotteries;
+          isLoading = false;
+        }
+        currentPage++;
+        hasMoreItems = fetchedLotteries.length == itemsPerPage;
       });
     } catch (e) {
       print('Error fetching lotteries: $e');
       setState(() {
-        isLoading = false;
+        if (loadMore) {
+          isLoadingMore = false;
+        } else {
+          isLoading = false;
+        }
       });
     }
   }
@@ -91,36 +120,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAppBar() {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfilePage(userId: widget.userId),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: widget.userId),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
+                style: const TextStyle(color: Colors.black),
               ),
-            );
-          },
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Text(
-              userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
-              style: const TextStyle(color: Colors.black),
             ),
           ),
-        ),
-        Text(
-          '${userData['wallet'] ?? 0}',
-          style: const TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      ],
-    ),
-  );
-}
+          Text(
+            '${userData['wallet'] ?? 0}',
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildTitle() {
     return const Padding(
@@ -186,45 +215,70 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Expanded(
-      child: ListView.builder(
-        itemCount: lotteries.length,
-        itemBuilder: (context, index) {
-          final lottery = lotteries[index];
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(lottery['number'].toString(),
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold)),
-                          const Text('Price: 100',
-                              style: TextStyle(color: Colors.black54)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    color: Colors.black,
-                    padding: const EdgeInsets.all(16),
-                    child: const Icon(Icons.shopping_cart, color: Colors.white),
-                  ),
-                ],
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            fetchLotteries(loadMore: true);
+          }
+          return true;
+        },
+        child: ListView.builder(
+          itemCount: lotteries.length + (hasMoreItems ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == lotteries.length) {
+              return _buildLoadingIndicator();
+            }
+            return _buildLotteryItem(lotteries[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: isLoadingMore
+            ? const CircularProgressIndicator()
+            : const Text('No more items',
+                style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _buildLotteryItem(Map<String, dynamic> lottery) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.amber,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(lottery['number'].toString(),
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text('Price: 100',
+                        style: TextStyle(color: Colors.black54)),
+                  ],
+                ),
               ),
             ),
-          );
-        },
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.all(16),
+              child: const Icon(Icons.shopping_cart, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
