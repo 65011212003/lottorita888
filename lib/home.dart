@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoadingMore = false;
   Map<String, dynamic> userData = {};
   int currentPage = 0;
-  final int itemsPerPage = 20;
+  final int itemsPerPage = 100;
   bool hasMoreItems = true;
 
   @override
@@ -79,6 +79,15 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print('Error fetching user data: $e');
     }
+  }
+
+  void updateLotteryStatus(int lotteryId) {
+    setState(() {
+      int index = lotteries.indexWhere((lottery) => lottery['id'] == lotteryId);
+      if (index != -1) {
+        lotteries[index]['status'] = 'purchased';
+      }
+    });
   }
 
   @override
@@ -142,9 +151,22 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          Text(
-            '${userData['wallet'] ?? 0}',
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '${userData['wallet'] ?? 0}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -173,28 +195,43 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          const Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'ขอโชคใบไฮโล',
-                hintStyle: TextStyle(color: Colors.white70),
-                border: InputBorder.none,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'ขอโชคใบไฮโล',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                ),
+                style: TextStyle(color: Colors.white),
               ),
-              style: TextStyle(color: Colors.white),
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchPage()),
-              );
-            },
-            child: const Icon(Icons.search, color: Colors.amber),
-          ),
-        ],
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.search, color: Colors.white),
+              ),
+            ),
+            SizedBox(width: 8),
+          ],
+        ),
       ),
     );
   }
@@ -248,12 +285,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildLotteryItem(Map<String, dynamic> lottery) {
+    bool isPurchased = lottery['status'] == 'purchased';
+
+    if (isPurchased) {
+      return Container(); // Return an empty container for purchased lotteries
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.amber,
           borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -264,22 +314,144 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(lottery['number'].toString(),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                    const Text('Price: 100',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black)),
+                    Text('Price: 100',
                         style: TextStyle(color: Colors.black54)),
                   ],
                 ),
               ),
             ),
-            Container(
-              color: Colors.black,
-              padding: const EdgeInsets.all(16),
-              child: const Icon(Icons.shopping_cart, color: Colors.white),
+            GestureDetector(
+              onTap: () {
+                _showPurchaseConfirmationDialog(lottery);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: const Icon(Icons.shopping_cart, color: Colors.white),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showPurchaseConfirmationDialog(Map<String, dynamic> lottery) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'ยืนยันการซื้อ',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Icon(Icons.close, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              lottery['number'].toString(),
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            const Text('Lottorita 888', style: TextStyle(color: Colors.black54)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Credit'),
+                        Text('${userData['wallet']}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('จำนวน 1'),
+                        Text('-100.-', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                    const Divider(thickness: 1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('ยอดคงเหลือ'),
+                        Text('${userData['wallet'] - 100}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () async {
+                        try {
+                          final result = await ApiService.buyLottery(int.parse(widget.userId), lottery['id']);
+                          if (result['message'] == 'Lottery purchased successfully') {
+                            setState(() {
+                              userData['wallet'] -= 100;
+                            });
+                            Navigator.of(context).pop();
+                            // Update the lottery status and refresh the UI
+                            updateLotteryStatus(lottery['id']);
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to purchase lottery: $e')),
+                          );
+                        }
+                      },
+                      child: const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

@@ -129,6 +129,4 @@ class ApiService {
       throw Exception('Failed to get user: ${response.body}');
     }
   }
-
-  
 }
