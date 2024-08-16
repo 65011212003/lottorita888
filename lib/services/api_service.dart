@@ -100,4 +100,35 @@ class ApiService {
       throw Exception('Failed to reset system: ${response.body}');
     }
   }
+
+  static Future<Map<String, dynamic>> editProfile(int userId, String newUsername, String newPassword) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/edit_profile/$userId/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': newUsername,
+        'password': newPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to edit profile: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> getUser(int userId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user/$userId/'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to get user: ${response.body}');
+    }
+  }
+
+  
 }

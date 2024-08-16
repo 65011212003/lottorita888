@@ -15,11 +15,14 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:lottorita888/home.dart';
 import 'package:lottorita888/reward.dart';
 import 'package:lottorita888/safe.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
+  
+  get userId => null;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -324,31 +327,34 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildBottomNavBar() {
-    return Container(
-      color: Colors.amber,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(Icons.calendar_today, 'หวย', () {
-            // Add navigation or action for 'หวย' if needed
-          }),
-          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const RewardPage()),
-            );
-          }),
-          _buildNavItem(Icons.person, 'บัญชี', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SafePage()),
-            );
-          }),
-        ],
-      ),
-    );
-  }
+  return Container(
+    color: Colors.amber,
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildNavItem(Icons.calendar_today, 'หวย', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+          );
+        }),
+        _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RewardPage()),
+          );
+        }),
+        _buildNavItem(Icons.person, 'บัญชี', () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SafePage()),
+          );
+        }),
+      ],
+    ),
+  );
+}
 
   Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
     return GestureDetector(

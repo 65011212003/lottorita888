@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lottorita888/profile.dart';
+import 'package:lottorita888/search.dart';
 import 'services/api_service.dart';
 import 'reward.dart';
 import 'safe.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String userId;
+
+  const HomePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -13,11 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> lotteries = [];
   bool isLoading = true;
+  Map<String, dynamic> userData = {};
 
   @override
   void initState() {
     super.initState();
     fetchLotteries();
+    fetchUserData();
   }
 
   Future<void> fetchLotteries() async {
@@ -32,6 +38,17 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final user = await ApiService.getUser(int.parse(widget.userId));
+      setState(() {
+        userData = user;
+      });
+    } catch (e) {
+      print('Error fetching user data: $e');
     }
   }
 
@@ -74,20 +91,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAppBar() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          CircleAvatar(
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(userId: widget.userId),
+              ),
+            );
+          },
+          child: CircleAvatar(
             backgroundColor: Colors.white,
-            child: Text('joe', style: TextStyle(color: Colors.black)),
+            child: Text(
+              userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
+              style: const TextStyle(color: Colors.black),
+            ),
           ),
-          Text('400', style: TextStyle(color: Colors.white, fontSize: 18)),
-        ],
-      ),
-    );
-  }
+        ),
+        Text(
+          '${userData['wallet'] ?? 0}',
+          style: const TextStyle(color: Colors.white, fontSize: 18),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildTitle() {
     return const Padding(
@@ -109,11 +142,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSearchBar() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          Expanded(
+          const Expanded(
             child: TextField(
               decoration: InputDecoration(
                 hintText: 'ขอโชคใบไฮโล',
@@ -123,7 +156,15 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.white),
             ),
           ),
-          Icon(Icons.search, color: Colors.amber),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+            },
+            child: const Icon(Icons.search, color: Colors.amber),
+          ),
         ],
       ),
     );
@@ -168,9 +209,8 @@ class _HomePageState extends State<HomePage> {
                           Text(lottery['number'].toString(),
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
-                          // ignore: prefer_const_constructors
-                          Text('Price: 100',
-                              style: const TextStyle(color: Colors.black54)),
+                          const Text('Price: 100',
+                              style: TextStyle(color: Colors.black54)),
                         ],
                       ),
                     ),
@@ -189,46 +229,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildBottomNavBar() {
-  return Container(
-    color: Colors.amber,
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildNavItem(Icons.calendar_today, 'หวย', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
-        }),
-        _buildNavItem(Icons.emoji_events, 'รางวัล', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RewardPage()),
-          );
-        }),
-        _buildNavItem(Icons.person, 'บัญชี', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SafePage()),
-          );
-        }),
-      ],
-    ),
-  );
-}
+  Widget _buildBottomNavBar() {
+    return Container(
+      color: Colors.amber,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.calendar_today, 'หวย', () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+            );
+          }),
+          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RewardPage()),
+            );
+          }),
+          _buildNavItem(Icons.person, 'บัญชี', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SafePage()),
+            );
+          }),
+        ],
+      ),
+    );
+  }
 
-Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon),
-        Text(label),
-      ],
-    ),
-  );
-}
+  Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon),
+          Text(label),
+        ],
+      ),
+    );
+  }
 }

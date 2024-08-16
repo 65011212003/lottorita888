@@ -198,6 +198,8 @@ import 'package:lottorita888/safe.dart';
 
 class RewardPage extends StatefulWidget {
   const RewardPage({Key? key}) : super(key: key);
+  
+  get userId => null;
 
   @override
   _RewardPageState createState() => _RewardPageState();
@@ -360,7 +362,7 @@ class _RewardPageState extends State<RewardPage> {
           _buildNavItem(context, Icons.home, 'หวย', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
+              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
           _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
