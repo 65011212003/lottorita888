@@ -477,7 +477,7 @@ class _HomePageState extends State<HomePage> {
           _buildNavItem(Icons.person, 'บัญชี', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SafePage()),
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId,)),
             );
           }),
         ],

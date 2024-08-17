@@ -348,7 +348,7 @@ class _SearchPageState extends State<SearchPage> {
         _buildNavItem(Icons.person, 'บัญชี', () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const SafePage()),
+            MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
           );
         }),
       ],

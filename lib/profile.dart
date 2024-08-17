@@ -361,7 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildNavItem(context, Icons.person, 'บัญชี', () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const SafePage()),
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
             );
           }),
         ],

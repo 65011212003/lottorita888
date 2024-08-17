@@ -1,196 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// class RewardPage extends StatefulWidget {
-//   const RewardPage({super.key});
-
-//   @override
-//   _RewardPageState createState() => _RewardPageState();
-// }
-
-// class _RewardPageState extends State<RewardPage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           // Background image
-//           Image.asset(
-//             'assets/images/background.jpg',
-//             fit: BoxFit.cover,
-//             width: double.infinity,
-//             height: double.infinity,
-//           ),
-//           SafeArea(
-//             child: Column(
-//               children: [
-//                 _buildHeader(),
-//                 _buildDateDisplay(),
-//                 Expanded(
-//                   child: SingleChildScrollView(
-//                     child: _buildRewardsList(),
-//                   ),
-//                 ),
-//                 _buildBottomNavBar(),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildHeader() {
-//     return const Padding(
-//       padding: EdgeInsets.all(16.0),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Row(
-//             children: [
-//               CircleAvatar(
-//                 backgroundColor: Colors.white,
-//                 child: Text('joe', style: TextStyle(color: Colors.black)),
-//               ),
-//               SizedBox(width: 8),
-//               Text('joe', style: TextStyle(color: Colors.white, fontSize: 18)),
-//             ],
-//           ),
-//           Row(
-//             children: [
-//               Icon(Icons.account_balance_wallet, color: Colors.white),
-//               SizedBox(width: 4),
-//               Text('400', style: TextStyle(color: Colors.white, fontSize: 18)),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildDateDisplay() {
-//     return const Padding(
-//       padding: EdgeInsets.symmetric(vertical: 8.0),
-//       child: Text(
-//         'งวดวันที่ 16 สิงหาคม 2567',
-//         style: TextStyle(color: Colors.white, fontSize: 18),
-//       ),
-//     );
-//   }
-
-//   Widget _buildRewardsList() {
-//     return Column(
-//       children: [
-//         _buildRewardCard('รางวัลที่ 1', '1 1 1 1 1 1', '1,000,000 บาท'),
-//         _buildRewardCard('รางวัลที่ 2', '6 8 2 1 8 4', '200,000 บาท'),
-//         _buildRewardCard('รางวัลที่ 3', '5 4 3 1 9 0', '80,000 บาท'),
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//           children: [
-//             _buildSmallRewardCard('รางวัลที่ 4', '5 3 2 3 4 6', '40,000 บาท'),
-//             _buildSmallRewardCard('รางวัลที่ 5', '9 0 2 1 2 4', '20,000 บาท'),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-
-//   Widget _buildRewardCard(String title, String numbers, String prize) {
-//     return Container(
-//       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//       decoration: BoxDecoration(
-//         color: Colors.amber,
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       child: Column(
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//           ),
-//           Container(
-//             padding: const EdgeInsets.symmetric(vertical: 16),
-//             color: Colors.amber[100],
-//             child: Center(
-//               child: Text(
-//                 numbers,
-//                 style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8),
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Text(prize, style: const TextStyle(fontSize: 16)),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildSmallRewardCard(String title, String numbers, String prize) {
-//     return Container(
-//       width: MediaQuery.of(context).size.width * 0.45,
-//       margin: const EdgeInsets.symmetric(vertical: 8),
-//       decoration: BoxDecoration(
-//         color: Colors.amber,
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       child: Column(
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//           ),
-//           Container(
-//             padding: const EdgeInsets.symmetric(vertical: 12),
-//             color: Colors.amber[100],
-//             child: Center(
-//               child: Text(
-//                 numbers,
-//                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4),
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Text(prize, style: const TextStyle(fontSize: 14)),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildBottomNavBar() {
-//     return Container(
-//       color: Colors.amber,
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 8.0),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceAround,
-//           children: [
-//             _buildNavItem(Icons.home, 'หวย'),
-//             _buildNavItem(Icons.emoji_events, 'รางวัล'),
-//             _buildNavItem(Icons.person, 'ดูโพย'),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildNavItem(IconData icon, String label) {
-//     return Column(
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         Icon(icon),
-//         Text(label),
-//       ],
-//     );
-//   }
-// }
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:lottorita888/home.dart';
 import '../services/api_service.dart';
@@ -208,8 +15,8 @@ class RewardPage extends StatefulWidget {
 class _RewardPageState extends State<RewardPage> {
   List<Map<String, dynamic>> _lotteryResults = [];
   bool _isLoading = true;
-  String _username = 'joe'; // Replace with actual username
-  int _wallet = 400; // Replace with actual wallet amount
+  String _username = 'joe';
+  int _wallet = 400;
 
   @override
   void initState() {
@@ -237,31 +44,29 @@ class _RewardPageState extends State<RewardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Image.asset(
-            'assets/images/background.jpg',
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.jpg'),
             fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
           ),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildDateDisplay(),
-                Expanded(
-                  child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : SingleChildScrollView(
-                          child: _buildRewardsList(),
-                        ),
-                ),
-                _buildBottomNavBar(context),
-              ],
-            ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildDateDisplay(),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
+                        child: _buildRewardsList(),
+                      ),
+              ),
+              _buildBottomNavBar(context),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -282,12 +87,19 @@ class _RewardPageState extends State<RewardPage> {
               Text(_username, style: const TextStyle(color: Colors.white, fontSize: 18)),
             ],
           ),
-          Row(
-            children: [
-              const Icon(Icons.account_balance_wallet, color: Colors.white),
-              const SizedBox(width: 4),
-              Text('$_wallet', style: const TextStyle(color: Colors.white, fontSize: 18)),
-            ],
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
+                const SizedBox(width: 4),
+                Text('$_wallet', style: const TextStyle(color: Colors.black, fontSize: 16)),
+              ],
+            ),
           ),
         ],
       ),
@@ -310,13 +122,19 @@ class _RewardPageState extends State<RewardPage> {
     }
 
     return Column(
-      children: _lotteryResults.map((result) {
-        return _buildRewardCard(
-          'รางวัลที่ ${result['prize_tier']}',
-          result['winning_number'].toString(),
-          '${result['prize_amount']} บาท',
-        );
-      }).toList(),
+      children: [
+        _buildRewardCard('รางวัลที่ 1', '1 1 1 1 1 1', 'รางวัล 1,000,000 บาท'),
+        _buildRewardCard('รางวัลที่ 2', '6 8 2 1 8 4', 'รางวัล 200,000 บาท'),
+        _buildRewardCard('รางวัลที่ 3', '5 4 3 1 9 0', 'รางวัล 80,000 บาท'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildSmallRewardCard('รางวัลที่ 4', '5 3 2 3 4 6', 'รางวัล 40,000 บาท'),
+            SizedBox(width: 10),
+            _buildSmallRewardCard('รางวัลที่ 5', '9 0 2 1 2 4', 'รางวัล 20,000 บาท'),
+          ],
+        ),
+      ],
     );
   }
 
@@ -324,7 +142,11 @@ class _RewardPageState extends State<RewardPage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.amber,
+        gradient: LinearGradient(
+          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -334,8 +156,9 @@ class _RewardPageState extends State<RewardPage> {
             child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            color: Colors.amber[100],
+            color: Colors.white,
             child: Center(
               child: Text(
                 numbers,
@@ -352,9 +175,47 @@ class _RewardPageState extends State<RewardPage> {
     );
   }
 
+  Widget _buildSmallRewardCard(String title, String numbers, String prize) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.43,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            color: Colors.white,
+            child: Center(
+              child: Text(
+                numbers,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 4),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(prize, style: const TextStyle(fontSize: 14)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      color: Colors.amber,
+      color: Color(0xFFFFA500),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -366,15 +227,12 @@ class _RewardPageState extends State<RewardPage> {
             );
           }),
           _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const RewardPage()),
-            );
+            // Already on rewards page
           }),
-          _buildNavItem(context, Icons.person, 'บัญชี', () {
+          _buildNavItem(context, Icons.person, 'ดูโพย', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SafePage()),
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
             );
           }),
         ],
@@ -388,8 +246,8 @@ class _RewardPageState extends State<RewardPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon),
-          Text(label),
+          Icon(icon, color: Colors.black),
+          Text(label, style: TextStyle(color: Colors.black)),
         ],
       ),
     );
