@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Row(
           children: [
-            Expanded(
+            const Expanded(
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'ขอโชคใบไฮโล',
@@ -229,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                 child: const Icon(Icons.search, color: Colors.white),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
           ],
         ),
       ),
@@ -301,7 +301,7 @@ class _HomePageState extends State<HomePage> {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 4,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -314,11 +314,11 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(lottery['number'].toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black)),
-                    Text('Price: 100',
+                    const Text('Price: 100',
                         style: TextStyle(color: Colors.black54)),
                   ],
                 ),
@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> {
                 _showPurchaseConfirmationDialog(lottery);
               },
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
