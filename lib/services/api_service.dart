@@ -129,4 +129,20 @@ class ApiService {
       throw Exception('Failed to get user: ${response.body}');
     }
   }
+
+  static Future<Map<String, dynamic>> deposit(int userId, double amount) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/deposit/$userId/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'amount': amount,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to deposit: ${response.body}');
+    }
+  }
 }
