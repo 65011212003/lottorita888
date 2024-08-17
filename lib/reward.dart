@@ -45,7 +45,7 @@ class _RewardPageState extends State<RewardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/background.jpg'),
             fit: BoxFit.cover,
@@ -88,14 +88,14 @@ class _RewardPageState extends State<RewardPage> {
             ],
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
-                Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
+                const Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
                 const SizedBox(width: 4),
                 Text('$_wallet', style: const TextStyle(color: Colors.black, fontSize: 16)),
               ],
@@ -130,7 +130,7 @@ class _RewardPageState extends State<RewardPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSmallRewardCard('รางวัลที่ 4', '5 3 2 3 4 6', 'รางวัล 40,000 บาท'),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             _buildSmallRewardCard('รางวัลที่ 5', '9 0 2 1 2 4', 'รางวัล 20,000 บาท'),
           ],
         ),
@@ -142,7 +142,7 @@ class _RewardPageState extends State<RewardPage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -180,7 +180,7 @@ class _RewardPageState extends State<RewardPage> {
       width: MediaQuery.of(context).size.width * 0.43,
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -215,7 +215,7 @@ class _RewardPageState extends State<RewardPage> {
 
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      color: Color(0xFFFFA500),
+      color: const Color(0xFFFFA500),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -247,7 +247,7 @@ class _RewardPageState extends State<RewardPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: Colors.black),
-          Text(label, style: TextStyle(color: Colors.black)),
+          Text(label, style: const TextStyle(color: Colors.black)),
         ],
       ),
     );

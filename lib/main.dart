@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lottorita888/admin_home.dart';
+import 'package:lottorita888/admin_system.dart';
 import 'package:lottorita888/home.dart';
 import 'package:lottorita888/reward.dart';
 import 'package:lottorita888/safe.dart';
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const LoginScreen(),
+      home: SystemAdminPage(),
     );
   }
 }
