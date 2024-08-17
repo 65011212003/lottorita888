@@ -254,13 +254,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:lottorita888/home.dart';
 import 'package:lottorita888/main.dart';
@@ -281,8 +274,10 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _depositAmountController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _depositAmountController =
+      TextEditingController();
 
   Map<String, dynamic> userData = {};
   bool isLoading = true;
@@ -343,45 +338,127 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showDepositDialog() {
+    int currentWallet = (userData['wallet'] as num?)?.toInt() ?? 0;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('ฝากเงิน'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _depositAmountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'จำนวนเงิน',
-                  hintText: 'ใส่จำนวนเงินที่ต้องการฝาก',
+        return StatefulBuilder(
+          builder: (context, setState) {
+            int depositAmount =
+                int.tryParse(_depositAmountController.text) ?? 0;
+            int newBalance = currentWallet + depositAmount;
+            return AlertDialog(
+              contentPadding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              content: Container(
+                width: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('ฝากไว ภายใน 0.1 วิ',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          InkWell(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: const Icon(Icons.close, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Row(
+                              children: [
+                                const Text('\$',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _depositAmountController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('credit'),
+                              Text('$currentWallet-'),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('ฝาก'),
+                              Text('+ $depositAmount-'),
+                            ],
+                          ),
+                          const Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('ยอดคงเหลือ'),
+                              Text('$newBalance-'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // Implement deposit functionality here
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(10)),
+                        ),
+                        child: const Text(
+                          'ฝาก',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Text('ยอดคงเหลือ: ${userData['wallet'] ?? 0}'),
-              const SizedBox(height: 16),
-              Text('เครดิต: ${userData['wallet'] ?? 0} + ${_depositAmountController.text}'),
-              const SizedBox(height: 16),
-              Text('ยอดคงเหลือ: ${(userData['wallet'] ?? 0) + int.tryParse(_depositAmountController.text) ?? 0}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('ยกเลิก'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text('ฝาก'),
-              onPressed: () {
-                // Implement deposit functionality here
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -432,7 +509,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           Text(
-            '${userData['wallet'] ?? 0}',
+            '${(userData['wallet'] as num?)?.toInt() ?? 0}',
             style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
         ],
@@ -454,7 +531,8 @@ class _ProfilePageState extends State<ProfilePage> {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.purple[100],
-            child: const Icon(Icons.person_outline, size: 50, color: Colors.purple),
+            child: const Icon(Icons.person_outline,
+                size: 50, color: Colors.purple),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -465,14 +543,17 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 16),
           _buildTextField('ชื่อผู้ใช้', _usernameController),
           _buildTextField('รหัสผ่าน', _passwordController, obscureText: true),
-          _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController, obscureText: true),
+          _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController,
+              obscureText: true),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: ElevatedButton(
                   onPressed: _editProfile,
-                  style: ElevatedButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Colors.grey[300]),
+                  style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.grey[300]),
                   child: const Text('แก้ไข'),
                 ),
               ),
@@ -480,7 +561,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: _showDepositDialog,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.amber),
                   child: const Text('ฝากเงิน'),
                 ),
               ),
@@ -497,7 +579,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {bool obscureText = false}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool obscureText = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextField(
@@ -506,7 +589,8 @@ class _ProfilePageState extends State<ProfilePage> {
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
       ),
     );
@@ -522,7 +606,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildNavItem(context, Icons.calendar_today, 'หวย', () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+              MaterialPageRoute(
+                  builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
           _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
@@ -542,7 +627,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  Widget _buildNavItem(
+      BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -555,4 +641,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
