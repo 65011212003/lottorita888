@@ -145,4 +145,66 @@ class ApiService {
       throw Exception('Failed to deposit: ${response.body}');
     }
   }
+
+   static Future<List<Map<String, dynamic>>> getUserLotteries(int userId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_lotteries/$userId/'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> lotteries = jsonDecode(response.body);
+      return lotteries.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to get user lotteries: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> generateNewLotteries() async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/generate_new_lotteries/'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to generate new lotteries: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> claimWinningTicket(int userId, int ticketId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/claim_winning_ticket/$userId/$ticketId/'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to claim winning ticket: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteLottery(int userId, int lotteryId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/delete_lottery/$userId/$lotteryId/'),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to delete lottery: ${response.body}');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getUserWinningTickets(int userId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_winning_tickets/$userId/'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> winningTickets = jsonDecode(response.body);
+      return winningTickets.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to get user winning tickets: ${response.body}');
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottorita888/admin_system.dart';
 
 class LotteryAdminPage extends StatelessWidget {
   @override
@@ -21,7 +22,7 @@ class LotteryAdminPage extends StatelessWidget {
                   child: _buildRewardsList(context),
                 ),
               ),
-              _buildBottomNavBar(),
+              _buildBottomNavBar(context),
             ],
           ),
         ),
@@ -39,7 +40,7 @@ class LotteryAdminPage extends StatelessWidget {
             child: const Text('A', style: TextStyle(color: Colors.black)),
           ),
           const SizedBox(width: 8),
-          const Text('Admid', style: TextStyle(color: Colors.white, fontSize: 18)),
+          const Text('Admin', style: TextStyle(color: Colors.white, fontSize: 18)),
         ],
       ),
     );
@@ -164,27 +165,35 @@ class LotteryAdminPage extends StatelessWidget {
     );
   }
 
-Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
     return Container(
       color: Colors.amber,
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
+            const Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.emoji_events, color: Colors.black),
                 Text('รางวัล', style: TextStyle(color: Colors.black)),
               ],
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.grid_4x4, color: Colors.black),
-                Text('ระบบ', style: TextStyle(color: Colors.black)),
-              ],
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SystemAdminPage()),
+                );
+              },
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.grid_4x4, color: Colors.black),
+                  Text('ระบบ', style: TextStyle(color: Colors.black)),
+                ],
+              ),
             ),
           ],
         ),

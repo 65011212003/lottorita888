@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/home.dart';
+import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/reward.dart';
+import 'package:lottorita888/services/api_service.dart';
 
 class SafePage extends StatefulWidget {
   final String userId;
@@ -11,13 +13,17 @@ class SafePage extends StatefulWidget {
 }
 
 class _SafePageState extends State<SafePage> {
-  List<Map<String, dynamic>> lotteryItems = [
-    {'numbers': '1 1 1 1 1 1', 'message': 'ยินดีด้วย ถูกทุก รางวัลที่ 1', 'isWinner': true},
-    {'numbers': '5 6 3 2 1 2', 'message': 'เสียใจด้วย คุณถูกใบ้หวยจ้า', 'isWinner': false},
-    {'numbers': '3 4 2 6 7 8', 'message': 'เสียใจด้วย คุณถูกใบ้หวยจ้า', 'isWinner': false},
-    {'numbers': '6 9 2 1 8 4', 'message': 'ยินดีด้วย ถูกทุก รางวัลที่ 2', 'isWinner': true},
-    {'numbers': '5 5 5 3 2 1', 'message': 'เสียใจด้วย คุณถูกใบ้หวยจ้า', 'isWinner': false},
-  ];
+  List<Map<String, dynamic>> lotteryItems = [];
+  Map<String, dynamic> userData = {};
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+    fetchUserLotteries();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,33 +54,84 @@ class _SafePageState extends State<SafePage> {
     );
   }
 
+  Future<void> fetchUserData() async {
+    try {
+      final user = await ApiService.getUser(int.parse(widget.userId));
+      setState(() {
+        userData = user;
+      });
+    } catch (e) {
+      print('Error fetching user data: $e');
+      setState(() {
+        errorMessage = 'Failed to load user data. Please try again.';
+      });
+    }
+  }
+
+  Future<void> fetchUserLotteries() async {
+  setState(() {
+    isLoading = true;
+    errorMessage = '';
+  });
+  try {
+    final lotteries = await ApiService.getUserLotteries(int.parse(widget.userId));
+    setState(() {
+      lotteryItems = lotteries.map((lottery) {
+        return {
+          'number': lottery['number'] ?? 'Unknown',
+          'message': lottery['is_winner'] == true ? 'ยินดีด้วย คุณถูกรางวัล' : 'เสียใจด้วย คุณไม่ถูกรางวัล',
+          'isWinner': lottery['is_winner'] == true,
+        };
+      }).toList();
+      isLoading = false;
+    });
+  } catch (e) {
+    print('Error fetching user lotteries: $e');
+    setState(() {
+      lotteryItems = [];
+      isLoading = false;
+      errorMessage = 'Failed to load lotteries. Please try again.';
+    });
+  }
+}
+
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text('J', style: TextStyle(color: Colors.black)),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: widget.userId),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
+                style: const TextStyle(color: Colors.black),
               ),
-              SizedBox(width: 8),
-              Text('joe', style: TextStyle(color: Colors.white, fontSize: 18)),
-            ],
+            ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
-                SizedBox(width: 4),
-                Text('400', style: TextStyle(color: Colors.black, fontSize: 16)),
+                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '${userData['wallet'] ?? 0}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
@@ -105,24 +162,43 @@ class _SafePageState extends State<SafePage> {
   }
 
   Widget _buildLotteryList() {
-    return ListView.builder(
-      itemCount: lotteryItems.length,
-      itemBuilder: (context, index) {
-        final item = lotteryItems[index];
-        return _buildLotteryItem(item['numbers'], item['message'], item['isWinner'], index);
-      },
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (errorMessage.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(errorMessage, style: TextStyle(color: Colors.white)),
+            ElevatedButton(
+              onPressed: fetchUserLotteries,
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (lotteryItems.isEmpty) {
+      return Center(child: Text('No lotteries found', style: TextStyle(color: Colors.white)));
+    }
+    return RefreshIndicator(
+      onRefresh: fetchUserLotteries,
+      child: ListView.builder(
+        itemCount: lotteryItems.length,
+        itemBuilder: (context, index) {
+          final item = lotteryItems[index];
+          return _buildLotteryItem(item['number'], item['message'], item['isWinner'], index);
+        },
+      ),
     );
   }
 
-  Widget _buildLotteryItem(String numbers, String message, bool isWinner, int index) {
+  Widget _buildLotteryItem(String? number, String message, bool isWinner, int index) {
     return GestureDetector(
       onTap: () {
         if (isWinner) {
-          _showWinningDialog(context, numbers);
-        } else {
-          setState(() {
-            lotteryItems.removeAt(index);
-          });
+          _showWinningDialog(context, number ?? 'Unknown');
         }
       },
       child: Container(
@@ -140,7 +216,7 @@ class _SafePageState extends State<SafePage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      numbers,
+                      number ?? 'Unknown',
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),

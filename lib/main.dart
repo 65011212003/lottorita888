@@ -7,6 +7,7 @@ import 'package:lottorita888/safe.dart';
 import 'dart:ui';
 import 'register.dart';
 import 'package:lottorita888/services/api_service.dart';
+import 'admin_home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SystemAdminPage(),
+      home: const LoginScreen(),
     );
   }
 }
@@ -46,18 +47,27 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final result = await ApiService.login(
-        _usernameController.text,
-        _passwordController.text,
-      );
-      
-      if (result.containsKey('user_id')) {
-        String userId = result['user_id'].toString();
+      // Check if the username and password are both "admin"
+      if (_usernameController.text == 'admin' && _passwordController.text == 'admin') {
+        // Navigate to LotteryAdminPage
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomePage(userId: userId)),
+          MaterialPageRoute(builder: (context) => LotteryAdminPage()),
         );
       } else {
-        throw Exception('User ID not found in the response');
+        // Proceed with normal login
+        final result = await ApiService.login(
+          _usernameController.text,
+          _passwordController.text,
+        );
+        
+        if (result.containsKey('user_id')) {
+          String userId = result['user_id'].toString();
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomePage(userId: userId)),
+          );
+        } else {
+          throw Exception('User ID not found in the response');
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

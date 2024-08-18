@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottorita888/admin_home.dart';
 
 class SystemAdminPage extends StatelessWidget {
   @override
@@ -23,7 +24,7 @@ class SystemAdminPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: _buildBottomNavBar(context),
     );
   }
 
@@ -84,86 +85,86 @@ class SystemAdminPage extends StatelessWidget {
     );
   }
 
- void showCustomDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.yellow,
-                        shape: BoxShape.circle,
+  void showCustomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 300,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.yellow,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, color: Colors.black, size: 24),
                       ),
-                      child: const Icon(Icons.close, color: Colors.black, size: 24),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'ต้องการล้างข้อมูล\nทั้งหมดหรือไม่?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  '(มั้ย?)',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                _buildCheckboxItem('ใบ lotto ทั้งหมด'),
+                _buildCheckboxItem('ข้อมูลผู้ใช้ และ credit'),
+                _buildCheckboxItem('รายการหวยที่ออก'),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle clear action
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'ต้องการล้างข้อมูล\nทั้งหมดหรือไม่?',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                '(มั้ย?)',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 20),
-              _buildCheckboxItem('ใบ lotto ทั้งหมด'),
-              _buildCheckboxItem('ข้อมูลผู้ใช้ และ credit'),
-              _buildCheckboxItem('รายการหวยที่ออก'),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle clear action
-                  Navigator.of(context).pop();
-                },
-                child: const Text('บัดดิ้งๆ', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  child: const Text('บัดดิ้งๆ', style: TextStyle(color: Colors.white)),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-Widget _buildCheckboxItem(String label) {
-  return Row(
-    children: [
-      Checkbox(
-        value: true,
-        onChanged: (bool? value) {
-          // Handle checkbox state
-        },
-        activeColor: Colors.red,
-      ),
-      Text(label),
-    ],
-  );
-}
+  Widget _buildCheckboxItem(String label) {
+    return Row(
+      children: [
+        Checkbox(
+          value: true,
+          onChanged: (bool? value) {
+            // Handle checkbox state
+          },
+          activeColor: Colors.red,
+        ),
+        Text(label),
+      ],
+    );
+  }
 
   Widget _buildTabButtons() {
     return Padding(
@@ -266,22 +267,30 @@ Widget _buildCheckboxItem(String label) {
     );
   }
 
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
     return Container(
       color: Colors.amber,
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.emoji_events, color: Colors.black),
-                Text('รางวัล', style: TextStyle(color: Colors.black)),
-              ],
+            GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LotteryAdminPage()),
+                );
+              },
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.emoji_events, color: Colors.black),
+                  Text('รางวัล', style: TextStyle(color: Colors.black)),
+                ],
+              ),
             ),
-            Column(
+            const Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.grid_4x4, color: Colors.black),
