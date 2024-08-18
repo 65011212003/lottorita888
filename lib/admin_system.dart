@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/admin_home.dart';
+import 'package:lottorita888/services/api_service.dart';
 
-class SystemAdminPage extends StatelessWidget {
+class SystemAdminPage extends StatefulWidget {
+  @override
+  _SystemAdminPageState createState() => _SystemAdminPageState();
+}
+
+class _SystemAdminPageState extends State<SystemAdminPage> {
+  int totalLotteries = 100;
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,10 +67,10 @@ class SystemAdminPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            const Row(
+            Row(
               children: [
                 Text('Lotto ในระบบตอนนี้ ทั้งหมด ', style: TextStyle(fontSize: 14)),
-                Text('100', style: TextStyle(fontSize: 14, color: Colors.amber)),
+                Text('$totalLotteries', style: TextStyle(fontSize: 14, color: Colors.amber)),
                 Text(' ใบ', style: TextStyle(fontSize: 14)),
               ],
             ),
@@ -69,14 +78,16 @@ class SystemAdminPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: isLoading ? null : _generateNewLotteries,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('สุ่มตัวเลข', style: TextStyle(color: Colors.white)),
+                child: isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : const Text('สุ่มตัวเลข', style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -130,10 +141,7 @@ class SystemAdminPage extends StatelessWidget {
                 _buildCheckboxItem('รายการหวยที่ออก'),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle clear action
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: isLoading ? null : _resetSystem,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     minimumSize: const Size(double.infinity, 50),
@@ -141,7 +149,9 @@ class SystemAdminPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text('บัดดิ้งๆ', style: TextStyle(color: Colors.white)),
+                  child: isLoading
+                      ? CircularProgressIndicator(color: Colors.white)
+                      : const Text('บัดดิ้งๆ', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
@@ -301,5 +311,56 @@ class SystemAdminPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _resetSystem() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final result = await ApiService.resetSystem();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+      Navigator.of(context).pop(); // Close the dialog
+      _refreshData();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _generateNewLotteries() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final result = await ApiService.generateNewLotteries();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+      _refreshData();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _refreshData() {
+    // Here you would typically fetch the updated data from the server
+    // For now, we'll just update the totalLotteries
+    setState(() {
+      totalLotteries = 100; // This should be fetched from the server in a real scenario
+    });
   }
 }

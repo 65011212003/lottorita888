@@ -69,31 +69,67 @@ class _SafePageState extends State<SafePage> {
   }
 
   Future<void> fetchUserLotteries() async {
-  setState(() {
-    isLoading = true;
-    errorMessage = '';
-  });
-  try {
-    final lotteries = await ApiService.getUserLotteries(int.parse(widget.userId));
     setState(() {
-      lotteryItems = lotteries.map((lottery) {
-        return {
-          'number': lottery['number'] ?? 'Unknown',
-          'message': lottery['is_winner'] == true ? 'ยินดีด้วย คุณถูกรางวัล' : 'เสียใจด้วย คุณไม่ถูกรางวัล',
-          'isWinner': lottery['is_winner'] == true,
-        };
-      }).toList();
-      isLoading = false;
+      isLoading = true;
+      errorMessage = '';
     });
-  } catch (e) {
-    print('Error fetching user lotteries: $e');
-    setState(() {
-      lotteryItems = [];
-      isLoading = false;
-      errorMessage = 'Failed to load lotteries. Please try again.';
-    });
+    try {
+      final lotteries = await ApiService.getUserLotteries(int.parse(widget.userId));
+      setState(() {
+        lotteryItems = lotteries.map((lottery) {
+          return {
+            'id': lottery['id'],
+            'number': lottery['number'] ?? 'Unknown',
+            'message': lottery['is_winner'] == true ? 'ยินดีด้วย คุณถูกรางวัล' : 'เสียใจด้วย คุณไม่ถูกรางวัล',
+            'isWinner': lottery['is_winner'] == true,
+          };
+        }).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching user lotteries: $e');
+      setState(() {
+        lotteryItems = [];
+        isLoading = false;
+        errorMessage = 'Failed to load lotteries. Please try again.';
+      });
+    }
   }
-}
+
+  Future<void> claimWinningTicket(int ticketId) async {
+    try {
+      final result = await ApiService.claimWinningTicket(int.parse(widget.userId), ticketId);
+      setState(() {
+        userData['wallet'] = (userData['wallet'] ?? 0) + (result['amount'] ?? 0);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${result['message'] ?? 'Winning ticket claimed successfully'}\nยอดคงเหลือ: ${userData['wallet']} บาท')),
+      );
+      await deleteLottery(ticketId);
+    } catch (e) {
+      print('Error claiming winning ticket: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to claim winning ticket. Please try again.')),
+      );
+    }
+  }
+
+  Future<void> deleteLottery(int lotteryId) async {
+    try {
+      await ApiService.deleteLottery(int.parse(widget.userId), lotteryId);
+      setState(() {
+        lotteryItems.removeWhere((item) => item['id'] == lotteryId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lottery ticket deleted successfully')),
+      );
+    } catch (e) {
+      print('Error deleting lottery: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete lottery. Please try again.')),
+      );
+    }
+  }
 
   Widget _buildHeader() {
     return Padding(
@@ -195,10 +231,11 @@ class _SafePageState extends State<SafePage> {
   }
 
   Widget _buildLotteryItem(String? number, String message, bool isWinner, int index) {
+    final ticketId = lotteryItems[index]['id'];
     return GestureDetector(
       onTap: () {
         if (isWinner) {
-          _showWinningDialog(context, number ?? 'Unknown');
+          _showWinningDialog(context, number ?? 'Unknown', ticketId);
         }
       },
       child: Container(
@@ -236,10 +273,12 @@ class _SafePageState extends State<SafePage> {
               width: 50,
               height: 80,
               color: isWinner ? Colors.green : Colors.red,
-              child: Icon(
-                isWinner ? Icons.check : Icons.close,
-                color: Colors.white,
-              ),
+              child: isWinner
+                  ? Icon(Icons.check, color: Colors.white)
+                  : IconButton(
+                      icon: Icon(Icons.delete, color: Colors.white),
+                      onPressed: () => _showDeleteConfirmation(context, ticketId),
+                    ),
             ),
           ],
         ),
@@ -247,80 +286,127 @@ class _SafePageState extends State<SafePage> {
     );
   }
 
-  void _showWinningDialog(BuildContext context, String winningNumbers) {
+  void _showWinningDialog(BuildContext context, String winningNumbers, int ticketId) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'ชิ้นรางวัล',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      winningNumbers,
+                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Lotteria 888', style: TextStyle(color: Colors.grey)),
+                  const SizedBox(height: 20),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Credit', style: TextStyle(color: Colors.grey)),
+                          Text('อันดับ 1', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Text('+1,000,000', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('ยอดคงเหลือ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('${userData['wallet']}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    child: const Text('ยืนยัน'),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      try {
+                        final result = await ApiService.deleteLottery(int.parse(widget.userId), ticketId);
+                        // Update the UI after successful deletion
+                        setState(() {
+                          lotteryItems.removeWhere((item) => item['id'] == ticketId);
+                          userData['wallet'] = (userData['wallet'] ?? 0) + (result['amount'] ?? 0);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${result['message'] ?? 'Winning ticket claimed successfully'}\nยอดคงเหลือ: ${userData['wallet']} บาท')),
+                        );
+                      } catch (e) {
+                        print('Error claiming winning ticket: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to claim winning ticket. Please try again.')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+  void _showDeleteConfirmation(BuildContext context, int ticketId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'ชิ้นรางวัล',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    winningNumbers,
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text('Lotteria 888', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 20),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Credit', style: TextStyle(color: Colors.grey)),
-                        Text('อันดับ 1', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Text('+1,000,000', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const Divider(),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('ยอดคงเหลือ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('1,000,400.-', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  child: const Text('ยืนยัน'),
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                ),
-              ],
+        return AlertDialog(
+          title: Text('Delete Lottery Ticket'),
+          content: Text('Are you sure you want to delete this lottery ticket?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-          ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteLottery(ticketId);
+              },
+            ),
+          ],
         );
       },
     );

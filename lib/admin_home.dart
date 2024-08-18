@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/admin_system.dart';
+import 'package:lottorita888/services/api_service.dart';
 
-class LotteryAdminPage extends StatelessWidget {
+class LotteryAdminPage extends StatefulWidget {
+  const LotteryAdminPage({super.key});
+
+  @override
+  _LotteryAdminPageState createState() => _LotteryAdminPageState();
+}
+
+class _LotteryAdminPageState extends State<LotteryAdminPage> {
+  List<Map<String, dynamic>> _winners = [];
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,15 +70,15 @@ class LotteryAdminPage extends StatelessWidget {
   Widget _buildRewardsList(BuildContext context) {
     return Column(
       children: [
-        _buildRewardCard('รางวัลที่ 1', 'X X X X X X', 'รางวัล 1,000,000 บาท'),
-        _buildRewardCard('รางวัลที่ 2', 'X X X X X X', 'รางวัล 200,000 บาท'),
-        _buildRewardCard('รางวัลที่ 3', 'X X X X X X', 'รางวัล 80,000 บาท'),
+        _buildRewardCard('รางวัลที่ 1', _winners.isNotEmpty ? _winners[0]['number'] : 'X X X X X X', 'รางวัล 1,000,000 บาท'),
+        _buildRewardCard('รางวัลที่ 2', _winners.length > 1 ? _winners[1]['number'] : 'X X X X X X', 'รางวัล 50,000 บาท'),
+        _buildRewardCard('รางวัลที่ 3', _winners.length > 2 ? _winners[2]['number'] : 'X X X X X X', 'รางวัล 25,000 บาท'),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSmallRewardCard(context, 'รางวัลที่ 4', 'X X X X X X', 'รางวัล 40,000 บาท'),
+            _buildSmallRewardCard(context, 'รางวัลที่ 4', _winners.length > 3 ? _winners[3]['number'] : 'X X X X X X', 'รางวัล 5,000 บาท'),
             const SizedBox(width: 10),
-            _buildSmallRewardCard(context, 'รางวัลที่ 5', 'X X X X X X', 'รางวัล 20,000 บาท'),
+            _buildSmallRewardCard(context, 'รางวัลที่ 5', _winners.length > 4 ? _winners[4]['number'] : 'X X X X X X', 'รางวัล 1,000 บาท'),
           ],
         ),
         const SizedBox(height: 16),
@@ -153,9 +164,9 @@ class LotteryAdminPage extends StatelessWidget {
 
   Widget _buildRandomButton() {
     return ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.refresh, color: Colors.black),
-      label: const Text('สุ่มรางวัล', style: TextStyle(color: Colors.black)),
+      onPressed: _isLoading ? null : _drawLottery,
+      icon: _isLoading ? const CircularProgressIndicator() : const Icon(Icons.refresh, color: Colors.black),
+      label: Text(_isLoading ? 'กำลังสุ่ม...' : 'สุ่มรางวัล', style: const TextStyle(color: Colors.black)),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFA500),
         shape: RoundedRectangleBorder(
@@ -199,5 +210,26 @@ class LotteryAdminPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _drawLottery() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final winners = await ApiService.drawLottery();
+      setState(() {
+        _winners = winners;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to draw lottery: $e')),
+      );
+    }
   }
 }

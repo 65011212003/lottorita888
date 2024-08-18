@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final fetchedLotteries = await ApiService.getLotteries(
         skip: currentPage * itemsPerPage,
-        limit: itemsPerPage,
+        limit: itemsPerPage, filter: '',
       );
       setState(() {
         if (loadMore) {

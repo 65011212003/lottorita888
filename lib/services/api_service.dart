@@ -39,7 +39,7 @@ class ApiService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getLotteries({int skip = 0, int limit = 100}) async {
+  static Future<List<Map<String, dynamic>>> getLotteries({int skip = 0, int limit = 100, required String filter}) async {
     final response = await http.get(
       Uri.parse('$baseUrl/lotteries/?skip=$skip&limit=$limit'),
     );
