@@ -8,8 +8,16 @@ class SystemAdminPage extends StatefulWidget {
 }
 
 class _SystemAdminPageState extends State<SystemAdminPage> {
-  int totalLotteries = 100;
+  int totalLotteries = 0;
   bool isLoading = false;
+  List<Map<String, dynamic>> lotteries = [];
+  String currentFilter = 'all'; // 'all', 'sold', or 'unsold'
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLotteries();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,40 +191,40 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _changeFilter('all'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
+                backgroundColor: currentFilter == 'all' ? Colors.amber : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('ทั้งหมด', style: TextStyle(color: Colors.black)),
+              child: Text('ทั้งหมด', style: TextStyle(color: currentFilter == 'all' ? Colors.black : Colors.white)),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _changeFilter('sold'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white38,
+                backgroundColor: currentFilter == 'sold' ? Colors.amber : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('ขายแล้ว', style: TextStyle(color: Colors.white)),
+              child: Text('ขายแล้ว', style: TextStyle(color: currentFilter == 'sold' ? Colors.black : Colors.white)),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _changeFilter('unsold'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white38,
+                backgroundColor: currentFilter == 'unsold' ? Colors.amber : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('ยังไม่ขาย', style: TextStyle(color: Colors.white)),
+              child: Text('ยังไม่ขาย', style: TextStyle(color: currentFilter == 'unsold' ? Colors.black : Colors.white)),
             ),
           ),
         ],
@@ -225,16 +233,19 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
   }
 
   Widget _buildLotteryList() {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     return ListView.builder(
-      itemCount: 4,
+      itemCount: lotteries.length,
       itemBuilder: (context, index) {
-        return _buildLotteryItem(index);
+        return _buildLotteryItem(lotteries[index]);
       },
     );
   }
 
-  Widget _buildLotteryItem(int index) {
-    bool isSold = index % 2 == 1;
+  Widget _buildLotteryItem(Map<String, dynamic> lottery) {
+    bool isSold = lottery['is_sold'] == true;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
@@ -249,7 +260,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Text(
-                    index == 3 ? '1 1 1 1 1 1' : '5 ${index + 3} 3 2 ${index == 0 ? '2 2' : '1 ${index + 1}'}',
+                    lottery['number'] ?? '',
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -267,7 +278,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             color: Colors.black54,
             child: Text(
-              isSold ? 'ขายแล้ว UserID: 1' : 'ยังไม่ขาย',
+              isSold ? 'ขายแล้ว UserID: ${lottery['user_id'] ?? ''}' : 'ยังไม่ขาย',
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white),
             ),
@@ -357,10 +368,44 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
   }
 
   void _refreshData() {
-    // Here you would typically fetch the updated data from the server
-    // For now, we'll just update the totalLotteries
+    fetchLotteries();
+  }
+
+  Future<void> fetchLotteries() async {
     setState(() {
-      totalLotteries = 100; // This should be fetched from the server in a real scenario
+      isLoading = true;
     });
+    try {
+      final fetchedLotteries = await ApiService.getLotteries(
+        skip: 0,
+        limit: 100,
+        filter: 'all', // เราจะดึงข้อมูลทั้งหมดมาก่อน
+      );
+      setState(() {
+        if (currentFilter == 'all') {
+          lotteries = fetchedLotteries;
+        } else if (currentFilter == 'sold') {
+          lotteries = fetchedLotteries.where((lottery) => lottery['is_sold'] == true).toList();
+        } else if (currentFilter == 'unsold') {
+          lotteries = fetchedLotteries.where((lottery) => lottery['is_sold'] != true).toList();
+        }
+        totalLotteries = fetchedLotteries.length; // จำนวนทั้งหมดยังคงเป็นจำนวนทั้งหมดที่มีในระบบ
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching lotteries: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _changeFilter(String filter) {
+    setState(() {
+      currentFilter = filter;
+    });
+    fetchLotteries();
   }
 }

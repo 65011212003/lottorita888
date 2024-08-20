@@ -3,15 +3,43 @@ import 'package:lottorita888/admin_system.dart';
 import 'package:lottorita888/services/api_service.dart';
 
 class LotteryAdminPage extends StatefulWidget {
-  const LotteryAdminPage({super.key});
+  const LotteryAdminPage({Key? key}) : super(key: key);
 
   @override
   _LotteryAdminPageState createState() => _LotteryAdminPageState();
 }
 
 class _LotteryAdminPageState extends State<LotteryAdminPage> {
-  List<Map<String, dynamic>> _winners = [];
+  Map<String, dynamic>? _latestDraw;
+  List<Map<String, dynamic>> _allDrawsInfo = [];
   bool _isLoading = false;
+  bool _showAllDraws = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllDrawsInfo();
+  }
+
+  Future<void> _fetchAllDrawsInfo() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final allDrawsInfo = await ApiService.getAllDrawsInfo();
+      setState(() {
+        _allDrawsInfo = allDrawsInfo;
+        _latestDraw = allDrawsInfo.isNotEmpty ? allDrawsInfo.first : null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('ไม่สามารถดึงข้อมูลการออกรางวัลทั้งหมดได้: ${e.toString()}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +55,13 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           child: Column(
             children: [
               _buildHeader(),
-              _buildDateDisplay(),
+              _buildToggleButton(),
               Expanded(
                 child: SingleChildScrollView(
-                  child: _buildRewardsList(context),
+                  child: _showAllDraws ? _buildAllDrawsInfo() : _buildRewardsList(),
                 ),
               ),
-              _buildBottomNavBar(context),
+              _buildBottomNavBar(),
             ],
           ),
         ),
@@ -57,34 +85,93 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     );
   }
 
-  Widget _buildDateDisplay() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        'งวดวันที่ 16 สิงหาคม 2567',
-        style: TextStyle(color: Colors.white, fontSize: 16),
+  Widget _buildToggleButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          _showAllDraws = !_showAllDraws;
+        });
+      },
+      child: Text(_showAllDraws ? 'แสดงงวดปัจจุบัน' : 'แสดงทุกงวด'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.amber,
+        foregroundColor: Colors.black,
       ),
     );
   }
 
-  Widget _buildRewardsList(BuildContext context) {
+  Widget _buildAllDrawsInfo() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Column(
+      children: _allDrawsInfo.map((draw) => _buildDrawInfo(draw)).toList(),
+    );
+  }
+
+  Widget _buildDrawInfo(Map<String, dynamic> draw) {
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: ExpansionTile(
+        title: Text('งวดวันที่ ${draw['draw_date']}'),
+        children: [
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: draw['winning_tickets'].length,
+            itemBuilder: (context, index) {
+              final ticket = draw['winning_tickets'][index];
+              return ListTile(
+                title: Text('เลขที่ถูกรางวัล: ${ticket['number']}'),
+                subtitle: Text('รางวัลที่ ${ticket['prize_tier']}: ${ticket['prize_amount']} บาท'),
+                trailing: Text(ticket['is_claimed'] ? 'รับรางวัลแล้ว' : 'ยังไม่รับรางวัล'),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardsList() {
+    if (_latestDraw == null) {
+      return const Center(child: Text('ไม่มีข้อมูลการออกรางวัล', style: TextStyle(color: Colors.white)));
+    }
+
     return Column(
       children: [
-        _buildRewardCard('รางวัลที่ 1', _winners.isNotEmpty ? _winners[0]['number'] : 'X X X X X X', 'รางวัล 1,000,000 บาท'),
-        _buildRewardCard('รางวัลที่ 2', _winners.length > 1 ? _winners[1]['number'] : 'X X X X X X', 'รางวัล 50,000 บาท'),
-        _buildRewardCard('รางวัลที่ 3', _winners.length > 2 ? _winners[2]['number'] : 'X X X X X X', 'รางวัล 25,000 บาท'),
+        _buildDateDisplay(),
+        _buildRewardCard('รางวัลที่ 1', _getWinnerNumber(0), 'รางวัล 1,000,000 บาท'),
+        _buildRewardCard('รางวัลที่ 2', _getWinnerNumber(1), 'รางวัล 50,000 บาท'),
+        _buildRewardCard('รางวัลที่ 3', _getWinnerNumber(2), 'รางวัล 25,000 บาท'),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSmallRewardCard(context, 'รางวัลที่ 4', _winners.length > 3 ? _winners[3]['number'] : 'X X X X X X', 'รางวัล 5,000 บาท'),
+            _buildSmallRewardCard('รางวัลที่ 4', _getWinnerNumber(3), 'รางวัล 5,000 บาท'),
             const SizedBox(width: 10),
-            _buildSmallRewardCard(context, 'รางวัลที่ 5', _winners.length > 4 ? _winners[4]['number'] : 'X X X X X X', 'รางวัล 1,000 บาท'),
+            _buildSmallRewardCard('รางวัลที่ 5', _getWinnerNumber(4), 'รางวัล 1,000 บาท'),
           ],
         ),
         const SizedBox(height: 16),
         _buildRandomButton(),
       ],
     );
+  }
+
+  Widget _buildDateDisplay() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        'งวดวันที่ ${_latestDraw!['draw_date']}',
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
+  }
+
+  String _getWinnerNumber(int index) {
+    final winningTickets = _latestDraw!['winning_tickets'] as List<dynamic>;
+    return winningTickets.length > index ? winningTickets[index]['number'] : 'X X X X X X';
   }
 
   Widget _buildRewardCard(String title, String numbers, String prize) {
@@ -124,7 +211,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     );
   }
 
-  Widget _buildSmallRewardCard(BuildContext context, String title, String numbers, String prize) {
+  Widget _buildSmallRewardCard(String title, String numbers, String prize) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.43,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -165,49 +252,59 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   Widget _buildRandomButton() {
     return ElevatedButton.icon(
       onPressed: _isLoading ? null : _drawLottery,
-      icon: _isLoading ? const CircularProgressIndicator() : const Icon(Icons.refresh, color: Colors.black),
+      icon: _isLoading 
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+              ),
+            ) 
+          : const Icon(Icons.refresh, color: Colors.black),
       label: Text(_isLoading ? 'กำลังสุ่ม...' : 'สุ่มรางวัล', style: const TextStyle(color: Colors.black)),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFA500),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context) {
+  Widget _buildBottomNavBar() {
     return Container(
       color: Colors.amber,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.emoji_events, color: Colors.black),
-                Text('รางวัล', style: TextStyle(color: Colors.black)),
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNavBarItem(Icons.emoji_events, 'รางวัล', () {}),
+              _buildNavBarItem(Icons.grid_4x4, 'ระบบ', () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SystemAdminPage()),
                 );
-              },
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.grid_4x4, color: Colors.black),
-                  Text('ระบบ', style: TextStyle(color: Colors.black)),
-                ],
-              ),
-            ),
-          ],
+              }),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavBarItem(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.black),
+          Text(label, style: const TextStyle(color: Colors.black)),
+        ],
       ),
     );
   }
@@ -218,18 +315,41 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     });
 
     try {
-      final winners = await ApiService.drawLottery();
+      final newDraw = await ApiService.drawLottery();
       setState(() {
-        _winners = winners;
+        _latestDraw = newDraw as Map<String, dynamic>?;
+        _allDrawsInfo.insert(0, newDraw as Map<String, dynamic>);
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to draw lottery: $e')),
-      );
+      String errorMessage = 'ไม่สามารถสุ่มรางวัลได้';
+      if (e is Exception) {
+        errorMessage += ': ${e.toString()}';
+      }
+      _showErrorDialog(errorMessage);
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('เกิดข้อผิดพลาด'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('ตกลง'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

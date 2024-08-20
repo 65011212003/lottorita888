@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       int index = lotteries.indexWhere((lottery) => lottery['id'] == lotteryId);
       if (index != -1) {
-        lotteries[index]['status'] = 'purchased';
+        lotteries[index]['is_sold'] = true;
       }
     });
   }
@@ -285,10 +285,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildLotteryItem(Map<String, dynamic> lottery) {
-    bool isPurchased = lottery['status'] == 'purchased';
-
-    if (isPurchased) {
-      return Container(); // Return an empty container for purchased lotteries
+    if (lottery['is_sold'] == true) {
+      return Container(); // Return an empty container for sold lotteries
     }
 
     return Padding(

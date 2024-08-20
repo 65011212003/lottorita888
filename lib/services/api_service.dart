@@ -207,4 +207,17 @@ class ApiService {
       throw Exception('Failed to get user winning tickets: ${response.body}');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getAllDrawsInfo() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/all_draws_info/'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> drawsInfo = jsonDecode(response.body);
+      return drawsInfo.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to get all draws info: ${response.body}');
+    }
+  }
 }
