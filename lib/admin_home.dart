@@ -22,9 +22,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   }
 
   Future<void> _fetchAllDrawsInfo() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final allDrawsInfo = await ApiService.getAllDrawsInfo();
@@ -34,9 +32,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       _showErrorDialog('ไม่สามารถดึงข้อมูลการออกรางวัลทั้งหมดได้: ${e.toString()}');
     }
   }
@@ -57,8 +53,12 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
               _buildHeader(),
               _buildToggleButton(),
               Expanded(
-                child: SingleChildScrollView(
-                  child: _showAllDraws ? _buildAllDrawsInfo() : _buildRewardsList(),
+                child: RefreshIndicator(
+                  onRefresh: _fetchAllDrawsInfo,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: _showAllDraws ? _buildAllDrawsInfo() : _buildRewardsList(),
+                  ),
                 ),
               ),
               _buildBottomNavBar(),
@@ -87,11 +87,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
 
   Widget _buildToggleButton() {
     return ElevatedButton(
-      onPressed: () {
-        setState(() {
-          _showAllDraws = !_showAllDraws;
-        });
-      },
+      onPressed: () => setState(() => _showAllDraws = !_showAllDraws),
       child: Text(_showAllDraws ? 'แสดงงวดปัจจุบัน' : 'แสดงทุกงวด'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.amber,
@@ -105,8 +101,15 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      children: _allDrawsInfo.map((draw) => _buildDrawInfo(draw)).toList(),
+    if (_allDrawsInfo.isEmpty) {
+      return const Center(child: Text('ยังไม่มีข้อมูลการออกรางวัล', style: TextStyle(color: Colors.white)));
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _allDrawsInfo.length,
+      itemBuilder: (context, index) => _buildDrawInfo(_allDrawsInfo[index]),
     );
   }
 
@@ -114,12 +117,12 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     return Card(
       margin: const EdgeInsets.all(8),
       child: ExpansionTile(
-        title: Text('งวดวันที่ ${draw['draw_date']}'),
+        title: Text('งวดวันที่ ${draw['draw_date'] ?? 'ไม่ระบุ'}'),
         children: [
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: draw['winning_tickets'].length,
+            itemCount: draw['winning_tickets']?.length ?? 0,
             itemBuilder: (context, index) {
               final ticket = draw['winning_tickets'][index];
               return ListTile(
@@ -135,10 +138,6 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   }
 
   Widget _buildRewardsList() {
-    if (_latestDraw == null) {
-      return const Center(child: Text('ไม่มีข้อมูลการออกรางวัล', style: TextStyle(color: Colors.white)));
-    }
-
     return Column(
       children: [
         _buildDateDisplay(),
@@ -163,15 +162,20 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
-        'งวดวันที่ ${_latestDraw!['draw_date']}',
+        _latestDraw != null ? 'งวดวันที่ ${_latestDraw!['draw_date']}' : 'ยังไม่มีการออกรางวัล',
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
   }
 
   String _getWinnerNumber(int index) {
+    if (_latestDraw == null || _latestDraw!['winning_tickets'] == null) {
+      return 'X X X X X X';
+    }
     final winningTickets = _latestDraw!['winning_tickets'] as List<dynamic>;
-    return winningTickets.length > index ? winningTickets[index]['number'] : 'X X X X X X';
+    return (winningTickets.length > index && winningTickets[index]['number'] != null)
+        ? winningTickets[index]['number']
+        : 'X X X X X X';
   }
 
   Widget _buildRewardCard(String title, String numbers, String prize) {
@@ -310,9 +314,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   }
 
   Future<void> _drawLottery() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final newDraw = await ApiService.drawLottery();
@@ -322,9 +324,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       String errorMessage = 'ไม่สามารถสุ่มรางวัลได้';
       if (e is Exception) {
         errorMessage += ': ${e.toString()}';
@@ -343,9 +343,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           actions: <Widget>[
             TextButton(
               child: const Text('ตกลง'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         );
