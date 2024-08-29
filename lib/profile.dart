@@ -72,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _logout(BuildContext context) async {
+  void _logout() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const LoginScreen()),
       (Route<dynamic> route) => false,
@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         : _buildProfileCard(),
                   ),
                 ),
-                _buildBottomNavBar(context),
+                _buildBottomNavBar(),
               ],
             ),
           ),
@@ -315,7 +315,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => _logout(context),
+            onPressed: _logout,
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('ออกจากระบบ'),
           ),
@@ -339,27 +339,27 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context) {
+  Widget _buildBottomNavBar() {
     return Container(
       color: Colors.amber,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(context, Icons.calendar_today, 'หวย', () {
+          _buildNavItem(Icons.calendar_today, 'หวย', () {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
-            Navigator.pushReplacement(
+          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const RewardPage()),
+              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(context, Icons.person, 'บัญชี', () {
-            Navigator.pushReplacement(
+          _buildNavItem(Icons.person, 'บัญชี', () {
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
             );
@@ -369,7 +369,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  Widget _buildNavItem(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(

@@ -327,35 +327,35 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildBottomNavBar() {
-  return Container(
-    color: Colors.amber,
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildNavItem(Icons.calendar_today, 'หวย', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
-          );
-        }),
-        _buildNavItem(Icons.emoji_events, 'รางวัล', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RewardPage()),
-          );
-        }),
-        _buildNavItem(Icons.person, 'บัญชี', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
-          );
-        }),
-      ],
-    ),
-  );
-}
-
+    return Container(
+      color: Colors.amber,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.calendar_today, 'หวย', () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+            );
+          }),
+          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
+            );
+          }),
+          _buildNavItem(Icons.person, 'บัญชี', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+  
   Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
     return GestureDetector(
       onTap: onTap,

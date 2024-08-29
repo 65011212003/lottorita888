@@ -4,7 +4,8 @@ import 'dart:convert';
 class ApiService {
   static const String baseUrl = 'https://docker-lotto-pma.onrender.com';
 
-  static Future<Map<String, dynamic>> register(String username, String password, int wallet) async {
+  static Future<Map<String, dynamic>> register(
+      String username, String password, int wallet) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register/'),
       headers: {'Content-Type': 'application/json'},
@@ -16,13 +17,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to register: ${response.body}');
     }
   }
 
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login/'),
       headers: {'Content-Type': 'application/json'},
@@ -33,13 +35,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to login: ${response.body}');
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getLotteries({int skip = 0, int limit = 100, required String filter}) async {
+  static Future<List<Map<String, dynamic>>> getLotteries(
+      {int skip = 0, int limit = 100, required String filter}) async {
     final response = await http.get(
       Uri.parse('$baseUrl/lotteries/?skip=$skip&limit=$limit'),
     );
@@ -52,13 +55,14 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> buyLottery(int userId, int lotteryId) async {
+  static Future<Map<String, dynamic>> buyLottery(
+      int userId, int lotteryId) async {
     final response = await http.post(
       Uri.parse('$baseUrl/buy_lottery/$userId/$lotteryId/'),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to buy lottery: ${response.body}');
     }
@@ -70,7 +74,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to get wallet: ${response.body}');
     }
@@ -95,13 +99,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to reset system: ${response.body}');
     }
   }
 
-  static Future<Map<String, dynamic>> editProfile(int userId, String newUsername, String newPassword) async {
+  static Future<Map<String, dynamic>> editProfile(
+      int userId, String newUsername, String newPassword) async {
     final response = await http.put(
       Uri.parse('$baseUrl/edit_profile/$userId/'),
       headers: {'Content-Type': 'application/json'},
@@ -112,7 +117,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to edit profile: ${response.body}');
     }
@@ -124,7 +129,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to get user: ${response.body}');
     }
@@ -140,20 +145,28 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to deposit: ${response.body}');
     }
   }
 
-   static Future<List<Map<String, dynamic>>> getUserLotteries(int userId) async {
+  static Future<Map<String, dynamic>> getUserLotteries(int userId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/user_lotteries/$userId/'),
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> lotteries = jsonDecode(response.body);
-      return lotteries.cast<Map<String, dynamic>>();
+      Map<String, dynamic> result = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (result.containsKey('message')) {
+        return {
+          'message': result['message'],
+          'lotteries': (result['lotteries'] as List).cast<Map<String, dynamic>>()
+        };
+      } else {
+        return {'lotteries': (result as List).cast<Map<String, dynamic>>()};
+      }
     } else {
       throw Exception('Failed to get user lotteries: ${response.body}');
     }
@@ -165,37 +178,40 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to generate new lotteries: ${response.body}');
     }
   }
 
-  static Future<Map<String, dynamic>> claimWinningTicket(int userId, int ticketId) async {
+  static Future<Map<String, dynamic>> claimWinningTicket(
+      int userId, int ticketId) async {
     final response = await http.post(
       Uri.parse('$baseUrl/claim_winning_ticket/$userId/$ticketId/'),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to claim winning ticket: ${response.body}');
     }
   }
 
-  static Future<Map<String, dynamic>> deleteLottery(int userId, int lotteryId) async {
+  static Future<Map<String, dynamic>> deleteLottery(
+      int userId, int lotteryId) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/delete_lottery/$userId/$lotteryId/'),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception('Failed to delete lottery: ${response.body}');
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getUserWinningTickets(int userId) async {
+  static Future<List<Map<String, dynamic>>> getUserWinningTickets(
+      int userId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/user_winning_tickets/$userId/'),
     );

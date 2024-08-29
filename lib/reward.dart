@@ -1,43 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:lottorita888/home.dart';
-import '../services/api_service.dart';
 import 'package:lottorita888/safe.dart';
+import 'package:lottorita888/services/api_service.dart';
+import 'package:intl/intl.dart';
 
 class RewardPage extends StatefulWidget {
-  const RewardPage({Key? key}) : super(key: key);
-  
-  get userId => null;
+  final String userId;
+  const RewardPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _RewardPageState createState() => _RewardPageState();
 }
 
 class _RewardPageState extends State<RewardPage> {
-  List<Map<String, dynamic>> _lotteryResults = [];
+  List<Map<String, dynamic>> _drawsInfo = [];
   bool _isLoading = true;
-  String _username = 'joe';
-  int _wallet = 400;
+  Map<String, dynamic> _userData = {};
 
   @override
   void initState() {
     super.initState();
-    _fetchLotteryResults();
+    _fetchData();
   }
 
-  Future<void> _fetchLotteryResults() async {
+  Future<void> _fetchData() async {
     try {
-      final results = await ApiService.drawLottery();
+      final drawsInfo = await ApiService.getAllDrawsInfo();
+      final userData = await ApiService.getUser(int.parse(widget.userId));
       setState(() {
-        _lotteryResults = results;
+        _drawsInfo = drawsInfo;
+        _userData = userData;
         _isLoading = false;
       });
     } catch (e) {
+      print('Error fetching data: $e');
       setState(() {
         _isLoading = false;
+        _userData = {};
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch lottery results: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch data: $e')),
+        );
+      }
     }
   }
 
@@ -52,20 +59,20 @@ class _RewardPageState extends State<RewardPage> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildDateDisplay(),
-              Expanded(
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    _buildHeader(),
+                    _buildDateDisplay(),
+                    Expanded(
+                      child: SingleChildScrollView(
                         child: _buildRewardsList(),
                       ),
-              ),
-              _buildBottomNavBar(context),
-            ],
-          ),
+                    ),
+                    _buildBottomNavBar(context),
+                  ],
+                ),
         ),
       ),
     );
@@ -77,27 +84,34 @@ class _RewardPageState extends State<RewardPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(_username[0].toUpperCase(), style: const TextStyle(color: Colors.black)),
+          GestureDetector(
+            onTap: () {
+              // Navigate to profile page
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                (_userData['username'] as String?)?.isNotEmpty == true
+                    ? (_userData['username'] as String).substring(0, 1).toUpperCase()
+                    : 'U',
+                style: const TextStyle(color: Colors.black),
               ),
-              const SizedBox(width: 8),
-              Text(_username, style: const TextStyle(color: Colors.white, fontSize: 18)),
-            ],
+            ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
-                const SizedBox(width: 4),
-                Text('$_wallet', style: const TextStyle(color: Colors.black, fontSize: 16)),
+                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '${_userData['wallet'] ?? 0}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
@@ -107,40 +121,51 @@ class _RewardPageState extends State<RewardPage> {
   }
 
   Widget _buildDateDisplay() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+    if (_drawsInfo.isEmpty) return SizedBox.shrink();
+    final drawDate = DateTime.parse(_drawsInfo[0]['draw_date']);
+    final formattedDate = DateFormat('d MMMM y').format(drawDate);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
-        'งวดวันที่ 16 สิงหาคม 2567',
+        'งวดวันที่ $formattedDate',
         style: TextStyle(color: Colors.white, fontSize: 18),
       ),
     );
   }
 
   Widget _buildRewardsList() {
-    if (_lotteryResults.isEmpty) {
+    if (_drawsInfo.isEmpty) {
       return const Center(child: Text('No lottery results available.', style: TextStyle(color: Colors.white)));
     }
 
+    final latestDraw = _drawsInfo[0];
+    final winningTickets = latestDraw['winning_tickets'] as List<dynamic>;
+    final prizeTiers = latestDraw['prize_tiers'] as List<dynamic>;
+
     return Column(
-      children: [
-        _buildRewardCard('รางวัลที่ 1', '1 1 1 1 1 1', 'รางวัล 1,000,000 บาท'),
-        _buildRewardCard('รางวัลที่ 2', '6 8 2 1 8 4', 'รางวัล 200,000 บาท'),
-        _buildRewardCard('รางวัลที่ 3', '5 4 3 1 9 0', 'รางวัล 80,000 บาท'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildSmallRewardCard('รางวัลที่ 4', '5 3 2 3 4 6', 'รางวัล 40,000 บาท'),
-            const SizedBox(width: 10),
-            _buildSmallRewardCard('รางวัลที่ 5', '9 0 2 1 2 4', 'รางวัล 20,000 บาท'),
-          ],
-        ),
-      ],
+      children: List.generate(5, (index) {
+        final tier = index + 1;
+        final winningTicket = winningTickets.firstWhere((ticket) => ticket['prize_tier'] == tier, orElse: () => null);
+        final prizeTier = prizeTiers.firstWhere((prize) => prize['tier'] == tier, orElse: () => null);
+
+        if (winningTicket == null || prizeTier == null) return SizedBox.shrink();
+
+        return _buildRewardCard(
+          'รางวัลที่ $tier',
+          winningTicket['number'],
+          'รางวัล ${NumberFormat('#,###').format(prizeTier['amount'])} บาท',
+          isSmall: tier > 3,
+        );
+      }),
     );
   }
 
-  Widget _buildRewardCard(String title, String numbers, String prize) {
+  Widget _buildRewardCard(String title, String numbers, String prize, {bool isSmall = false}) {
+    final cardWidth = isSmall ? MediaQuery.of(context).size.width * 0.43 : double.infinity;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      width: cardWidth,
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
@@ -153,60 +178,26 @@ class _RewardPageState extends State<RewardPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(title, style: TextStyle(fontSize: isSmall ? 16 : 18, fontWeight: FontWeight.bold)),
           ),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: isSmall ? 12 : 16),
             color: Colors.white,
             child: Center(
               child: Text(
                 numbers,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8),
+                style: TextStyle(
+                  fontSize: isSmall ? 20 : 32,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: isSmall ? 4 : 8,
+                ),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(prize, style: const TextStyle(fontSize: 16)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmallRewardCard(String title, String numbers, String prize) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.43,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            color: Colors.white,
-            child: Center(
-              child: Text(
-                numbers,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 4),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(prize, style: const TextStyle(fontSize: 14)),
+            child: Text(prize, style: TextStyle(fontSize: isSmall ? 14 : 16)),
           ),
         ],
       ),
@@ -215,21 +206,21 @@ class _RewardPageState extends State<RewardPage> {
 
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      color: const Color(0xFFFFA500),
+      color: Colors.amber,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(context, Icons.home, 'หวย', () {
-            Navigator.push(
+          _buildNavItem(context, Icons.calendar_today, 'หวย', () {
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
           _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
-            // Already on rewards page
+            // Already on the RewardPage, so no navigation needed
           }),
-          _buildNavItem(context, Icons.person, 'ดูโพย', () {
+          _buildNavItem(context, Icons.person, 'บัญชี', () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
