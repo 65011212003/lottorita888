@@ -92,7 +92,7 @@ class _SafePageState extends State<SafePage> {
 
   Future<void> fetchUserLotteries() async {
     try {
-      final result = await ApiService.getUserLotteries(int.parse(widget.userId));
+      final dynamic result = await ApiService.getUserLotteries(int.parse(widget.userId));
       setState(() {
         if (result is List) {
           lotteryItems = _processLotteryList(result as List);
@@ -156,7 +156,7 @@ class _SafePageState extends State<SafePage> {
 
   Future<void> fetchAllDrawsInfo() async {
     try {
-      final result = await ApiService.getAllDrawsInfo();
+      final dynamic result = await ApiService.getAllDrawsInfo();
       if (result is List) {
         allDrawsInfo = result.map((draw) => draw as Map<String, dynamic>).toList();
         updateUserWalletForWinningTickets();
