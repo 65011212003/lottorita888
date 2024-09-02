@@ -92,25 +92,35 @@ class _SafePageState extends State<SafePage> {
 
   Future<void> fetchUserLotteries() async {
     try {
-      final dynamic result = await ApiService.getUserLotteries(int.parse(widget.userId));
+      final result = await ApiService.getUserLotteries(int.parse(widget.userId));
       setState(() {
         if (result is List) {
-          lotteryItems = _processLotteryList(result as List);
+          lotteryItems = _processLotteryList(result.cast<Map<String, dynamic>>());
+          lotteryMessage = '';
         } else if (result is Map<String, dynamic>) {
           lotteryMessage = result['message'] ?? '';
-          lotteryItems = _processLotteryMap(result);
+          final lotteries = result['lotteries'];
+          if (lotteries is List) {
+            lotteryItems = _processLotteryList(lotteries.cast<Map<String, dynamic>>());
+          } else {
+            lotteryItems = [];
+          }
         } else {
-          throw Exception('Unexpected response format');
+          lotteryItems = [];
+          lotteryMessage = 'Unexpected response format';
         }
       });
     } catch (e) {
       print('Error fetching user lotteries: $e');
-      throw Exception('Failed to load lotteries');
+      setState(() {
+        lotteryItems = [];
+        lotteryMessage = 'Failed to load lotteries';
+      });
     }
   }
 
-  List<Map<String, dynamic>> _processLotteryList(List result) {
-    return result.map<Map<String, dynamic>>((lottery) {
+  List<Map<String, dynamic>> _processLotteryList(List<Map<String, dynamic>> lotteries) {
+    return lotteries.map((lottery) {
       String message = _getLotteryMessage(lottery);
       return {
         'id': lottery['id'],
@@ -125,8 +135,8 @@ class _SafePageState extends State<SafePage> {
   }
 
   List<Map<String, dynamic>> _processLotteryMap(Map<String, dynamic> result) {
-    final lotteries = result['lotteries'];
-    if (lotteries is List) {
+    final lotteries = result['lotteries'] as List<dynamic>?;
+    if (lotteries != null) {
       return lotteries.map<Map<String, dynamic>>((lottery) {
         String message = _getLotteryMessage(lottery);
         return {
@@ -139,9 +149,8 @@ class _SafePageState extends State<SafePage> {
           'isActive': lottery['is_active'],
         };
       }).toList();
-    } else {
-      return [];
     }
+    return [];
   }
 
   String _getLotteryMessage(Map<String, dynamic> lottery) {
@@ -156,16 +165,17 @@ class _SafePageState extends State<SafePage> {
 
   Future<void> fetchAllDrawsInfo() async {
     try {
-      final dynamic result = await ApiService.getAllDrawsInfo();
-      if (result is List) {
-        allDrawsInfo = result.map((draw) => draw as Map<String, dynamic>).toList();
-        updateUserWalletForWinningTickets();
-      } else {
-        throw Exception('Unexpected response format for draws info');
-      }
+      final result = await ApiService.getAllDrawsInfo();
+      setState(() {
+        allDrawsInfo = result.map((draw) => Map<String, dynamic>.from(draw)).toList();
+      });
+      updateUserWalletForWinningTickets();
     } catch (e) {
       print('Error fetching all draws info: $e');
-      throw Exception('Failed to load draws information');
+      // Instead of throwing an exception, we'll set allDrawsInfo to an empty list
+      setState(() {
+        allDrawsInfo = [];
+      });
     }
   }
 

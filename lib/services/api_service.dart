@@ -151,22 +151,27 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> getUserLotteries(int userId) async {
+  static Future<dynamic> getUserLotteries(int userId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/user_lotteries/$userId/'),
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> result = jsonDecode(response.body) as Map<String, dynamic>;
+      final dynamic decodedResponse = jsonDecode(response.body);
 
-      if (result.containsKey('message')) {
-        return {
-          'message': result['message'],
-          'lotteries': (result['lotteries'] as List).cast<Map<String, dynamic>>()
-        };
-      } else {
-        return {'lotteries': (result as List).cast<Map<String, dynamic>>()};
+      if (decodedResponse is List) {
+        return decodedResponse.cast<Map<String, dynamic>>();
+      } else if (decodedResponse is Map<String, dynamic>) {
+        if (decodedResponse.containsKey('message')) {
+          return {
+            'message': decodedResponse['message'],
+            'lotteries': (decodedResponse['lotteries'] as List?)?.cast<Map<String, dynamic>>() ?? []
+          };
+        }
       }
+
+      // If the response is neither a List nor a Map with 'message' key, return an empty list
+      return [];
     } else {
       throw Exception('Failed to get user lotteries: ${response.body}');
     }
