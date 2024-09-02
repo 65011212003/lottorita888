@@ -1,34 +1,27 @@
-// import 'package:flutter/material.dart';
-
-// class searchPage extends StatefulWidget {
-//   const searchPage({super.key});
-
-//   @override
-//   State<searchPage> createState() => _searchPageState();
-// }
-
-// class _searchPageState extends State<searchPage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container();
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:lottorita888/home.dart';
+import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/reward.dart';
 import 'package:lottorita888/safe.dart';
+import 'package:lottorita888/services/api_service.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
-  
-  get userId => null;
+   final String userId;
+  const SearchPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
+  Map<String, dynamic> userData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,17 +48,57 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  Future<void> fetchUserData() async {
+    try {
+      final user = await ApiService.getUser(int.parse(widget.userId));
+      setState(() {
+        userData = user;
+      });
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
   Widget _buildAppBar() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Text('joe', style: TextStyle(color: Colors.black)),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: widget.userId),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
           ),
-          Text('400', style: TextStyle(color: Colors.white, fontSize: 18)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '${userData['wallet'] ?? 0}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -279,12 +312,12 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Credit'),
-                    Text('400.-',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Credit'),
+                    Text('${userData['wallet'] ?? 0}.-',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const Row(
@@ -295,12 +328,12 @@ class _SearchPageState extends State<SearchPage> {
                   ],
                 ),
                 const Divider(thickness: 1),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('ยอดคงเหลือ'),
-                    Text('280.-',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('ยอดคงเหลือ'),
+                    Text('${(userData['wallet'] ?? 0) - 120}.-',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(height: 20),
