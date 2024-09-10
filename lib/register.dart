@@ -11,7 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _walletController = TextEditingController();
@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _walletController.dispose();
@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       try {
         final result = await ApiService.register(
-          _usernameController.text,
+          _emailController.text,
           _passwordController.text,
           int.parse(_walletController.text),
         );
@@ -122,8 +122,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 20),
                               _buildTextField(
-                                'ชื่อผู้ใช้',
-                                _usernameController,
+                                'อีเมล',
+                                _emailController,
+                                keyboardType: TextInputType.emailAddress,
                               ),
                               const SizedBox(height: 10),
                               _buildTextField(
@@ -215,9 +216,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (value == null || value.isEmpty) {
             return 'กรุณากรอก$hintText';
           }
+          if (hintText == 'อีเมล' && !_isValidEmail(value)) {
+            return 'กรุณากรอกอีเมลที่ถูกต้อง';
+          }
           return null;
         },
       ),
     );
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
