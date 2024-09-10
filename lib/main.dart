@@ -125,8 +125,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: <Widget>[
                           TextField(
                             controller: _usernameController,
+                            keyboardType: TextInputType.emailAddress,
                             decoration: const InputDecoration(
-                              labelText: 'ชื่อผู้ใช้/เบอร์โทรศัพท์',
+                              labelText: 'อีเมล',
+                              hintText: 'example@email.com',
                             ),
                           ),
                           const SizedBox(height: 10),
