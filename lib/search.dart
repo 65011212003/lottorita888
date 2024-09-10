@@ -6,7 +6,7 @@ import 'package:lottorita888/safe.dart';
 import 'package:lottorita888/services/api_service.dart';
 
 class SearchPage extends StatefulWidget {
-   final String userId;
+  final String userId;
   const SearchPage({Key? key, required this.userId}) : super(key: key);
 
   @override
@@ -15,11 +15,13 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   Map<String, dynamic> userData = {};
+  List<Map<String, dynamic>> lotteries = [];
 
   @override
   void initState() {
     super.initState();
     fetchUserData();
+    fetchLotteries();
   }
 
   @override
@@ -33,13 +35,12 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         child: SafeArea(
-          child: Column(
+          child: ListView(
             children: [
               _buildAppBar(),
               _buildTitle(),
               _buildSearchCard(),
               _buildLotteryNumber(),
-              const Spacer(),
               _buildBottomNavBar(),
             ],
           ),
@@ -56,6 +57,17 @@ class _SearchPageState extends State<SearchPage> {
       });
     } catch (e) {
       print('Error fetching user data: $e');
+    }
+  }
+
+  Future<void> fetchLotteries() async {
+    try {
+      final fetchedLotteries = await ApiService.getLotteries(filter: '');
+      setState(() {
+        lotteries = fetchedLotteries;
+      });
+    } catch (e) {
+      print('Error fetching lotteries: $e');
     }
   }
 
@@ -226,43 +238,54 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildLotteryNumber() {
     return Container(
       margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.amber,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
+      child: Column(
         children: [
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          for (var lottery in lotteries)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.amber,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
                 children: [
-                  Text('6 8 2 1 8 4',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  Text('Lottorita 888',
-                      style: TextStyle(color: Colors.black54)),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lottery['number'] ?? '',
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            lottery['name'] ?? 'Lottorita 888',
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _showPurchaseConfirmationDialog(lottery);
+                    },
+                    child: Container(
+                      color: Colors.black,
+                      padding: const EdgeInsets.all(16),
+                      child: const Icon(Icons.shopping_cart, color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              _showPurchaseConfirmationDialog();
-            },
-            child: Container(
-              color: Colors.black,
-              padding: const EdgeInsets.all(16),
-              child: const Icon(Icons.shopping_cart, color: Colors.white),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  void _showPurchaseConfirmationDialog() {
+  void _showPurchaseConfirmationDialog(Map<String, dynamic> lottery) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -297,16 +320,17 @@ class _SearchPageState extends State<SearchPage> {
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Column(
                       children: [
                         Text(
-                          '6 8 2 1 8 4',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                          lottery['number'] ?? '',
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                        Text('Lottorita 888',
-                            style: TextStyle(color: Colors.black54)),
+                        Text(
+                          lottery['name'] ?? 'Lottorita 888',
+                          style: const TextStyle(color: Colors.black54),
+                        ),
                       ],
                     ),
                   ),
