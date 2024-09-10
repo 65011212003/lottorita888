@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/admin_system.dart';
+import 'package:lottorita888/main.dart';
 import 'package:lottorita888/services/api_service.dart';
 
 class LotteryAdminPage extends StatefulWidget {
@@ -73,15 +74,37 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.purple[100],
-            child: const Text('A', style: TextStyle(color: Colors.black)),
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.purple[100],
+                child: const Text('A', style: TextStyle(color: Colors.black)),
+              ),
+              const SizedBox(width: 8),
+              const Text('Admin', style: TextStyle(color: Colors.white, fontSize: 18)),
+            ],
           ),
-          const SizedBox(width: 8),
-          const Text('Admin', style: TextStyle(color: Colors.white, fontSize: 18)),
+          ElevatedButton(
+            onPressed: _logout,
+            child: const Text('ออกจากระบบ'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _logout() {
+    // Implement logout logic here
+    // Clear user session (if any)
+    // Navigate to LoginScreen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
     );
   }
 

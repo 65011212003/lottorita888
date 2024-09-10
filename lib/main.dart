@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/admin_home.dart';
-import 'package:lottorita888/admin_system.dart';
 import 'package:lottorita888/home.dart';
-import 'package:lottorita888/reward.dart';
-import 'package:lottorita888/safe.dart';
 import 'dart:ui';
 import 'register.dart';
 import 'package:lottorita888/services/api_service.dart';
-import 'admin_home.dart';
 
 void main() {
   runApp(const MyApp());

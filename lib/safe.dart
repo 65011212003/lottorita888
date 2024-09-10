@@ -3,6 +3,7 @@ import 'package:lottorita888/home.dart';
 import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/reward.dart';
 import 'package:lottorita888/services/api_service.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class SafePage extends StatefulWidget {
   final String userId;
@@ -12,18 +13,34 @@ class SafePage extends StatefulWidget {
   _SafePageState createState() => _SafePageState();
 }
 
-class _SafePageState extends State<SafePage> {
+class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> lotteryItems = [];
   Map<String, dynamic> userData = {};
   bool isLoading = true;
   String errorMessage = '';
   List<Map<String, dynamic>> allDrawsInfo = [];
   String lotteryMessage = '';
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -47,35 +64,6 @@ class _SafePageState extends State<SafePage> {
         isLoading = false;
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Image.asset(
-            'assets/images/background.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildTitle(),
-                _buildDateDisplay(),
-                Expanded(
-                  child: _buildLotteryList(),
-                ),
-                _buildBottomNavBar(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> fetchUserData() async {
@@ -134,25 +122,6 @@ class _SafePageState extends State<SafePage> {
     }).toList();
   }
 
-  List<Map<String, dynamic>> _processLotteryMap(Map<String, dynamic> result) {
-    final lotteries = result['lotteries'] as List<dynamic>?;
-    if (lotteries != null) {
-      return lotteries.map<Map<String, dynamic>>((lottery) {
-        String message = _getLotteryMessage(lottery);
-        return {
-          'id': lottery['id'],
-          'number': lottery['number'] ?? 'Unknown',
-          'message': message,
-          'isWinner': lottery['is_winner'] == true,
-          'prizeTier': lottery['prize_tier'],
-          'prizeAmount': lottery['prize_amount'],
-          'isActive': lottery['is_active'],
-        };
-      }).toList();
-    }
-    return [];
-  }
-
   String _getLotteryMessage(Map<String, dynamic> lottery) {
     if (lottery['is_winner'] == true) {
       return 'ยินดีด้วย คุณถูกรางวัล';
@@ -172,7 +141,6 @@ class _SafePageState extends State<SafePage> {
       updateUserWalletForWinningTickets();
     } catch (e) {
       print('Error fetching all draws info: $e');
-      // Instead of throwing an exception, we'll set allDrawsInfo to an empty list
       setState(() {
         allDrawsInfo = [];
       });
@@ -239,6 +207,35 @@ class _SafePageState extends State<SafePage> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Image.asset(
+            'assets/images/background.jpg',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                _buildTitle(),
+                _buildDateDisplay(),
+                Expanded(
+                  child: _buildLotteryList(),
+                ),
+                _buildBottomNavBar(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -254,11 +251,14 @@ class _SafePageState extends State<SafePage> {
                 ),
               );
             },
-            child: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Text(
-                userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
-                style: const TextStyle(color: Colors.black),
+            child: Hero(
+              tag: 'profileAvatar',
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
+                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -266,15 +266,22 @@ class _SafePageState extends State<SafePage> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   '${userData['wallet'] ?? 0}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -286,67 +293,95 @@ class _SafePageState extends State<SafePage> {
 
   Widget _buildTitle() {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 16.0),
       child: Text(
         'ดูโพย',
-        style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              blurRadius: 10.0,
+              color: Colors.black,
+              offset: Offset(2.0, 2.0),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDateDisplay() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      color: Colors.black.withOpacity(0.5),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: const Text(
         'งวดวันที่ 16 สิงหาคม 2567',
-        style: TextStyle(color: Colors.white, fontSize: 18),
+        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
       ),
     );
   }
 
   Widget _buildLotteryList() {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.amber)));
     }
     if (errorMessage.isNotEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(errorMessage, style: TextStyle(color: Colors.white)),
+            Text(errorMessage, style: const TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadData,
-              child: Text('Retry'),
+              child: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
       );
     }
     if (lotteryItems.isEmpty) {
-      return Center(child: Text('No lotteries found', style: TextStyle(color: Colors.white)));
+      return const Center(child: Text('No lotteries found', style: TextStyle(color: Colors.white, fontSize: 18)));
     }
     return RefreshIndicator(
       onRefresh: _loadData,
-      child: ListView.builder(
-        itemCount: lotteryItems.length,
-        itemBuilder: (context, index) {
-          final item = lotteryItems[index];
-          return _buildLotteryItem(
-            item['number'],
-            item['message'],
-            item['isWinner'],
-            item['prizeTier'],
-            item['prizeAmount'],
-            index,
-          );
-        },
+      child: AnimationLimiter(
+        child: ListView.builder(
+          itemCount: lotteryItems.length,
+          itemBuilder: (context, index) {
+            final item = lotteryItems[index];
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: _buildLotteryItem(item, index),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildLotteryItem(String? number, String message, bool isWinner, int? prizeTier, int? prizeAmount, int index) {
-    final item = lotteryItems[index];
+  Widget _buildLotteryItem(Map<String, dynamic> item, int index) {
+    final number = item['number'];
+    final message = item['message'];
+    final isWinner = item['isWinner'];
+    final prizeTier = item['prizeTier'];
+    final prizeAmount = item['prizeAmount'];
     final ticketId = item['id'];
     final isActive = item['isActive'];
 
@@ -360,7 +395,14 @@ class _SafePageState extends State<SafePage> {
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: isActive ? Colors.amber : Colors.grey,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -369,28 +411,40 @@ class _SafePageState extends State<SafePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: Text(
                       number ?? 'Unknown',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Container(
                     width: double.infinity,
-                    color: _getMessageColor(message),
-                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _getMessageColor(message),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(15),
+                        bottomRight: Radius.circular(15),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(12),
                     child: Text(
                       message,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              width: 50,
-              height: 80,
-              color: _getStatusColor(isWinner, message),
+              width: 60,
+              height: 100,
+              decoration: BoxDecoration(
+                color: _getStatusColor(isWinner, message),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
+              ),
               child: _getStatusIcon(isWinner, message, ticketId),
             ),
           ],
@@ -400,136 +454,64 @@ class _SafePageState extends State<SafePage> {
   }
 
   Color _getMessageColor(String message) {
-    if (message == 'รอประกาศรางวัล') return Colors.blue;
-    if (message.contains('ยินดีด้วย')) return Colors.green;
-    return Colors.red;
+    if (message == 'ยินดีด้วย คุณถูกรางวัล') {
+      return Colors.green;
+    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
+      return Colors.red;
+    } else {
+      return Colors.blue;
+    }
   }
 
   Color _getStatusColor(bool isWinner, String message) {
-    if (message == 'รอประกาศรางวัล') return Colors.blue;
-    if (isWinner) return Colors.green;
-    return Colors.red;
+    if (isWinner) {
+      return Colors.green;
+    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
+      return Colors.red;
+    } else {
+      return Colors.blue;
+    }
   }
 
   Widget _getStatusIcon(bool isWinner, String message, int ticketId) {
-    if (message == 'รอประกาศรางวัล') {
-      return Icon(Icons.access_time, color: Colors.white);
-    }
     if (isWinner) {
-      return Icon(Icons.check, color: Colors.white);
+      return IconButton(
+        icon: const Icon(Icons.emoji_events, color: Colors.white),
+        onPressed: () => _showWinningDialog(context, 'Unknown', ticketId, null, null),
+      );
+    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
+      return const Icon(Icons.close, color: Colors.white);
+    } else {
+      return const Icon(Icons.access_time, color: Colors.white);
     }
-    return IconButton(
-      icon: Icon(Icons.delete, color: Colors.white),
-      onPressed: () => _showDeleteConfirmation(context, ticketId),
-    );
   }
 
-  void _showWinningDialog(BuildContext context, String winningNumbers, int ticketId, int? prizeTier, int? prizeAmount) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'ชิ้นรางวัล',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        winningNumbers,
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text('Lotteria 888', style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Credit', style: TextStyle(color: Colors.grey)),
-                            Text('อันดับ $prizeTier', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                        Text('+$prizeAmount', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('ยอดคงเหลือ', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${userData['wallet']}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      child: const Text('ยืนยัน'),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await claimWinningTicket(ticketId, prizeAmount ?? 0);
-                        setState(() {
-                          lotteryItems.removeWhere((item) => item['id'] == ticketId);
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context, int ticketId) {
+  void _showWinningDialog(BuildContext context, String number, int ticketId, int? prizeTier, int? prizeAmount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Lottery Ticket'),
-          content: Text('Are you sure you want to delete this lottery ticket?'),
+          title: const Text('Congratulations!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Your ticket number $number has won!'),
+              if (prizeTier != null) Text('Prize Tier: $prizeTier'),
+              if (prizeAmount != null) Text('Prize Amount: $prizeAmount'),
+            ],
+          ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: Text('Delete'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
-                deleteLottery(ticketId);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Claim Prize'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                claimWinningTicket(ticketId, prizeAmount ?? 0);
               },
             ),
           ],
@@ -540,8 +522,17 @@ class _SafePageState extends State<SafePage> {
 
   Widget _buildBottomNavBar() {
     return Container(
-      color: Colors.amber,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.amber,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -574,8 +565,9 @@ class _SafePageState extends State<SafePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.black),
-          Text(label, style: const TextStyle(color: Colors.black)),
+          Icon(icon, color: Colors.black, size: 28),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
         ],
       ),
     );
