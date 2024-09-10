@@ -13,7 +13,8 @@ class SafePage extends StatefulWidget {
   _SafePageState createState() => _SafePageState();
 }
 
-class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin {
+class _SafePageState extends State<SafePage>
+    with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> lotteryItems = [];
   Map<String, dynamic> userData = {};
   bool isLoading = true;
@@ -80,16 +81,19 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
 
   Future<void> fetchUserLotteries() async {
     try {
-      final result = await ApiService.getUserLotteries(int.parse(widget.userId));
+      final result =
+          await ApiService.getUserLotteries(int.parse(widget.userId));
       setState(() {
         if (result is List) {
-          lotteryItems = _processLotteryList(result.cast<Map<String, dynamic>>());
+          lotteryItems =
+              _processLotteryList(result.cast<Map<String, dynamic>>());
           lotteryMessage = '';
         } else if (result is Map<String, dynamic>) {
           lotteryMessage = result['message'] ?? '';
           final lotteries = result['lotteries'];
           if (lotteries is List) {
-            lotteryItems = _processLotteryList(lotteries.cast<Map<String, dynamic>>());
+            lotteryItems =
+                _processLotteryList(lotteries.cast<Map<String, dynamic>>());
           } else {
             lotteryItems = [];
           }
@@ -107,38 +111,38 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
     }
   }
 
-  List<Map<String, dynamic>> _processLotteryList(List<Map<String, dynamic>> lotteries) {
+  List<Map<String, dynamic>> _processLotteryList(
+      List<Map<String, dynamic>> lotteries) {
     return lotteries.map((lottery) {
-      String message = _getLotteryMessage(lottery);
       return {
         'id': lottery['id'],
-        'number': lottery['number'] ?? 'Unknown',
-        'message': message,
-        'isWinner': lottery['is_winner'] == true,
-        'prizeTier': lottery['prize_tier'],
-        'prizeAmount': lottery['prize_amount'],
+        'number': lottery['number']?.toString() ?? 'Unknown',
+        'state': lottery['state'] ?? 'unknown',
+        'prizeTier': lottery['prize_tier']?.toString() ?? 'Unknown',
+        'prizeAmount': lottery['prize_amount'] ?? 0,
         'isActive': lottery['is_active'],
+        'isClaimed': lottery['is_claimed'] ?? false,
       };
     }).toList();
-  }
-
-  String _getLotteryMessage(Map<String, dynamic> lottery) {
-    if (lottery['is_winner'] == true) {
-      return 'ยินดีด้วย คุณถูกรางวัล';
-    } else if (lottery['draw_id'] != null) {
-      return 'เสียใจด้วย คุณไม่ถูกรางวัล';
-    } else {
-      return 'รอประกาศรางวัล';
-    }
   }
 
   Future<void> fetchAllDrawsInfo() async {
     try {
       final result = await ApiService.getAllDrawsInfo();
       setState(() {
-        allDrawsInfo = result.map((draw) => Map<String, dynamic>.from(draw)).toList();
+        allDrawsInfo = result.map((draw) {
+          return Map<String, dynamic>.from(draw).map((key, value) {
+            if (value == null) {
+              return MapEntry(key, 0); // Replace null with 0 for numeric fields
+            }
+            if (value is int?) {
+              return MapEntry(
+                  key, value ?? 0); // Use 0 as default for nullable ints
+            }
+            return MapEntry(key, value);
+          });
+        }).toList();
       });
-      updateUserWalletForWinningTickets();
     } catch (e) {
       print('Error fetching all draws info: $e');
       setState(() {
@@ -152,10 +156,22 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
       final winningTickets = draw['winning_tickets'];
       if (winningTickets is List) {
         for (var ticket in winningTickets) {
-          if (ticket['owner_id'].toString() == widget.userId && ticket['is_claimed'] == false) {
+          if (ticket['owner_id'].toString() == widget.userId &&
+              ticket['is_claimed'] == false) {
             int prizeAmount = ticket['prize_amount'] ?? 0;
             setState(() {
               userData['wallet'] = (userData['wallet'] ?? 0) + prizeAmount;
+              // Update the corresponding lottery item
+              var lotteryItem = lotteryItems.firstWhere(
+                (item) => item['id'] == ticket['id'],
+                orElse: () => {},
+              );
+              if (lotteryItem.isNotEmpty) {
+                lotteryItem['state'] = 'win';
+                lotteryItem['prizeTier'] =
+                    ticket['prize_tier']?.toString() ?? 'Unknown';
+                lotteryItem['prizeAmount'] = prizeAmount;
+              }
             });
             claimWinningTicket(ticket['id'], prizeAmount);
           }
@@ -166,9 +182,12 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
 
   Future<void> claimWinningTicket(int ticketId, int prizeAmount) async {
     try {
-      final result = await ApiService.claimWinningTicket(int.parse(widget.userId), ticketId);
+      final result = await ApiService.claimWinningTicket(
+          int.parse(widget.userId), ticketId);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${result['message'] ?? 'Winning ticket claimed successfully'}\nยอดคงเหลือ: ${userData['wallet']} บาท')),
+        SnackBar(
+            content: Text(
+                '${result['message'] ?? 'Winning ticket claimed successfully'}\nยอดคงเหลือ: ${userData['wallet']} บาท')),
       );
       for (var draw in allDrawsInfo) {
         final winningTickets = draw['winning_tickets'];
@@ -181,11 +200,11 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
           }
         }
       }
-      await deleteLottery(ticketId);
     } catch (e) {
       print('Error claiming winning ticket: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to claim winning ticket. Please try again.')),
+        const SnackBar(
+            content: Text('Failed to claim winning ticket. Please try again.')),
       );
     }
   }
@@ -202,7 +221,8 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
     } catch (e) {
       print('Error deleting lottery: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to delete lottery. Please try again.')),
+        const SnackBar(
+            content: Text('Failed to delete lottery. Please try again.')),
       );
     }
   }
@@ -227,7 +247,7 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
                 Expanded(
                   child: _buildLotteryList(),
                 ),
-                _buildBottomNavBar(),
+                _buildBottomNavBar(context),
               ],
             ),
           ),
@@ -257,7 +277,8 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
                 backgroundColor: Colors.white,
                 child: Text(
                   userData['username']?.substring(0, 1).toUpperCase() ?? 'U',
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -277,11 +298,15 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 24),
+                const Icon(Icons.account_balance_wallet,
+                    color: Colors.amber, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   '${userData['wallet'] ?? 0}',
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -321,29 +346,35 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
       ),
       child: const Text(
         'งวดวันที่ 16 สิงหาคม 2567',
-        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+        style: TextStyle(
+            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
       ),
     );
   }
 
   Widget _buildLotteryList() {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.amber)));
+      return const Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.amber)));
     }
     if (errorMessage.isNotEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(errorMessage, style: const TextStyle(color: Colors.white, fontSize: 18)),
+            Text(errorMessage,
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadData,
               child: const Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                textStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -351,7 +382,9 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
       );
     }
     if (lotteryItems.isEmpty) {
-      return const Center(child: Text('No lotteries found', style: TextStyle(color: Colors.white, fontSize: 18)));
+      return const Center(
+          child: Text('No lotteries found',
+              style: TextStyle(color: Colors.white, fontSize: 18)));
     }
     return RefreshIndicator(
       onRefresh: _loadData,
@@ -360,16 +393,20 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
           itemCount: lotteryItems.length,
           itemBuilder: (context, index) {
             final item = lotteryItems[index];
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 375),
-              child: SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(
-                  child: _buildLotteryItem(item, index),
+            if (item['isClaimed'] != true) {
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                duration: const Duration(milliseconds: 375),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: _buildLotteryItem(item, index),
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
           },
         ),
       ),
@@ -378,29 +415,29 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
 
   Widget _buildLotteryItem(Map<String, dynamic> item, int index) {
     final number = item['number'];
-    final message = item['message'];
-    final isWinner = item['isWinner'];
+    final state = item['state'];
     final prizeTier = item['prizeTier'];
     final prizeAmount = item['prizeAmount'];
     final ticketId = item['id'];
     final isActive = item['isActive'];
+    final isClaimed = item['isClaimed'];
 
     return GestureDetector(
       onTap: () {
-        if (isWinner) {
-          _showWinningDialog(context, number ?? 'Unknown', ticketId, prizeTier, prizeAmount);
+        if (state == 'win' && !isClaimed) {
+          _showWinningDialog(context, number, ticketId, prizeTier, prizeAmount);
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         decoration: BoxDecoration(
-          color: isActive ? Colors.amber : Colors.grey,
-          borderRadius: BorderRadius.circular(15),
+          color: isActive ? Colors.amber.shade300 : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -411,41 +448,63 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      number ?? 'Unknown',
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                      number,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade800,
+                      ),
                     ),
                   ),
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: _getMessageColor(message),
+                      color: _getMessageColor(state),
                       borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(15),
-                        bottomRight: Radius.circular(15),
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
                       ),
                     ),
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 16),
                     child: Text(
-                      message,
-                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                      _getStateMessage(state),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              width: 60,
-              height: 100,
+              width: 70,
+              height: 120,
               decoration: BoxDecoration(
-                color: _getStatusColor(isWinner, message),
+                color: _getStatusColor(state),
                 borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
               ),
-              child: _getStatusIcon(isWinner, message, ticketId),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (state == 'lose')
+                    IconButton(
+                      icon: const Icon(Icons.close,
+                          color: Colors.white, size: 28),
+                      onPressed: () => deleteLottery(ticketId),
+                    ),
+                  if (state != 'lose') const SizedBox(height: 60),
+                  _getStatusIcon(state, isClaimed, ticketId, number, prizeTier,
+                      prizeAmount),
+                ],
+              ),
             ),
           ],
         ),
@@ -453,123 +512,170 @@ class _SafePageState extends State<SafePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Color _getMessageColor(String message) {
-    if (message == 'ยินดีด้วย คุณถูกรางวัล') {
-      return Colors.green;
-    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
-      return Colors.red;
-    } else {
-      return Colors.blue;
+  Color _getMessageColor(String state) {
+    switch (state) {
+      case 'win':
+        return Colors.green;
+      case 'lose':
+        return Colors.red;
+      case 'waiting':
+        return Colors.blue;
+      default:
+        return Colors.grey;
     }
   }
 
-  Color _getStatusColor(bool isWinner, String message) {
-    if (isWinner) {
-      return Colors.green;
-    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
-      return Colors.red;
-    } else {
-      return Colors.blue;
+  String _getStateMessage(String state) {
+    switch (state) {
+      case 'win':
+        return 'ยินดีด้วย คุณถูกรางวัล';
+      case 'lose':
+        return 'เสียใจด้วย คุณไม่ถูกรางวัล';
+      case 'waiting':
+        return 'รอประกาศรางวัล';
+      default:
+        return 'สถานะไม่ทราบ';
     }
   }
 
-  Widget _getStatusIcon(bool isWinner, String message, int ticketId) {
-    if (isWinner) {
-      return IconButton(
-        icon: const Icon(Icons.emoji_events, color: Colors.white),
-        onPressed: () => _showWinningDialog(context, 'Unknown', ticketId, null, null),
-      );
-    } else if (message == 'เสียใจด้วย คุณไม่ถูกรางวัล') {
-      return const Icon(Icons.close, color: Colors.white);
-    } else {
-      return const Icon(Icons.access_time, color: Colors.white);
+  Color _getStatusColor(String state) {
+    switch (state) {
+      case 'win':
+        return Colors.green;
+      case 'lose':
+        return Colors.red;
+      case 'waiting':
+        return Colors.blue;
+      default:
+        return Colors.grey;
     }
   }
 
-  void _showWinningDialog(BuildContext context, String number, int ticketId, int? prizeTier, int? prizeAmount) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Your ticket number $number has won!'),
-              if (prizeTier != null) Text('Prize Tier: $prizeTier'),
-              if (prizeAmount != null) Text('Prize Amount: $prizeAmount'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Claim Prize'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                claimWinningTicket(ticketId, prizeAmount ?? 0);
-              },
-            ),
-          ],
+  Widget _getStatusIcon(String state, bool isClaimed, int ticketId,
+      String number, String? prizeTier, int? prizeAmount) {
+    switch (state) {
+      case 'win':
+        return IconButton(
+          icon: const Icon(Icons.emoji_events, color: Colors.white),
+          onPressed: isClaimed
+              ? null
+              : () => _showWinningDialog(
+                  context, number, ticketId, prizeTier, prizeAmount),
         );
-      },
-    );
+      case 'lose':
+        return const Icon(Icons.close, color: Colors.white);
+      case 'waiting':
+        return const Icon(Icons.access_time, color: Colors.white);
+      default:
+        return const Icon(Icons.help_outline, color: Colors.white);
+    }
   }
 
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.amber,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      color: Colors.amber,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.calendar_today, 'หวย', () {
+          _buildNavItem(context, Icons.calendar_today, 'หวย', () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+              MaterialPageRoute(
+                  builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+          _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
+              MaterialPageRoute(
+                  builder: (context) => RewardPage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(Icons.person, 'บัญชี', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
-            );
-          }),
+          _buildNavItem(context, Icons.person, 'บัญชี', () {}),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildNavItem(
+      BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.black, size: 28),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
+          Icon(icon, color: Colors.black),
+          Text(label, style: const TextStyle(color: Colors.black)),
         ],
       ),
+    );
+  }
+
+  void _showWinningDialog(BuildContext context, String number, int ticketId,
+      String? prizeTier, int? prizeAmount) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 300,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'ขึ้นรางวัล',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'เลขที่ถูกรางวัล: $number',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'รางวัลที่ได้: ${prizeTier ?? 'Unknown'}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await claimWinningTicket(ticketId, prizeAmount ?? 0);
+                    setState(() {
+                      // Refresh the page
+                      _loadData();
+                    });
+                  },
+                  child: const Text('รับรางวัล'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
