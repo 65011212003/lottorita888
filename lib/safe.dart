@@ -285,7 +285,6 @@ class _SafePageState extends State<SafePage>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -298,14 +297,12 @@ class _SafePageState extends State<SafePage>
             child: Row(
               children: [
                 const Icon(Icons.account_balance_wallet,
-                    color: Colors.amber, size: 24),
+                    color: Color.fromARGB(255, 255, 255, 255), size: 24),
                 const SizedBox(width: 8),
                 Text(
                   '${userData['wallet'] ?? 0}',
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                      color: Colors.white, fontSize: 20, fontFamily: 'Abel'),
                 ),
               ],
             ),

@@ -155,20 +155,17 @@ class _HomePageState extends State<HomePage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
               children: [
                 const Icon(Icons.account_balance_wallet,
-                    color: Colors.amber, size: 20),
+                    color: Color.fromARGB(255, 246, 246, 246), size: 20),
                 const SizedBox(width: 8),
                 Text(
                   '${userData['wallet'] ?? 0}',
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                      color: Colors.white, fontSize: 18, fontFamily: 'Abel'),
                 ),
               ],
             ),
@@ -211,7 +208,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withOpacity(0.07),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -241,7 +238,14 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.amber,
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFAE8625), // สี AE8625
+                      Color(0xFFF7EF8A), // สี F7EF8A
+                    ],
+                    begin: Alignment.topLeft, // จุดเริ่มต้นของ gradient
+                    end: Alignment.bottomRight, // จุดสิ้นสุดของ gradient
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(Icons.search, color: Colors.white),
@@ -311,7 +315,16 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.amber,
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFAE8625), // AE8625
+              Color(0xFFF7EF8A), // F7EF8A
+              Color(0xFFD2AC47), // D2AC47
+              Color(0xFFEDC967), // EDC967
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -327,15 +340,21 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(lottery['number'].toString(),
                         style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black)),
+                          fontSize: 24,
+                          fontFamily: 'Abel',
+                          color: Colors.black,
+                          letterSpacing: 30.0,
+                        )),
                     const Text('Price: 100',
-                        style: TextStyle(color: Colors.black54)),
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontFamily: 'Abel',
+                        )),
                   ],
                 ),
               ),
@@ -345,6 +364,7 @@ class _HomePageState extends State<HomePage> {
                 _showPurchaseConfirmationDialog(lottery);
               },
               child: Container(
+                height: 87,
                 decoration: const BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.only(
@@ -353,7 +373,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 padding: const EdgeInsets.all(16),
-                child: const Icon(Icons.shopping_cart, color: Colors.white),
+                child: const Icon(Icons.shopping_cart, color: Colors.yellow),
               ),
             ),
           ],
