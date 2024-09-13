@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:lottorita888/home.dart';
 import 'package:lottorita888/main.dart';
 import 'package:lottorita888/reward.dart';
@@ -31,12 +33,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final user = await ApiService.getUser(int.parse(widget.userId));
       setState(() {
         userData = user;
         _usernameController.text = user['username'] ?? '';
         _emailController.text = user['email'] ?? '';
+        _passwordController.text = user['password'] ?? '';
         isLoading = false;
       });
     } catch (e) {
@@ -44,6 +51,9 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ไม่สามารถดึงข้อมูลผู้ใช้: $e')),
+      );
     }
   }
 
@@ -56,13 +66,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
-      await ApiService.editProfile(
+      final result = await ApiService.editProfile(
         int.parse(widget.userId),
         _usernameController.text,
+        _emailController.text,
         _passwordController.text,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('อัปเดตโปรไฟล์สำเร็จ')),
+        SnackBar(content: Text('อัปเดตโปรไฟล์สำเร็จ: ${result['message'] ?? ''}')),
       );
       fetchUserData();
     } catch (e) {
@@ -230,11 +241,11 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 _buildHeader(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _buildProfileCard(),
-                  ),
+                  child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
+                        child: _buildProfileCard(),
+                      ),
                 ),
                 _buildBottomNavBar(),
               ],
@@ -291,8 +302,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
           _buildTextField('ชื่อผู้ใช้', _usernameController),
+          _buildTextField('อีเมล', _emailController),
           _buildTextField('รหัสผ่าน', _passwordController, obscureText: true),
-          _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController, obscureText: true),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -332,6 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
+          hintText: obscureText ? '••••••' : null,
           border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),

@@ -67,13 +67,6 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            const Row(
-              children: [
-                Icon(Icons.arrow_drop_down, color: Colors.black),
-                Text('งวดวันที่ 16 สิงหาคม 2567', style: TextStyle(fontSize: 14)),
-              ],
-            ),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -278,7 +271,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             color: Colors.black54,
             child: Text(
-              isSold ? 'ขายแล้ว UserID: ${lottery['user_id'] ?? ''}' : 'ยังไม่ขาย',
+              isSold ? 'ขายแล้ว' : 'ยังไม่ขาย',
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white),
             ),

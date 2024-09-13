@@ -361,7 +361,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('เกิดข้อผิดพลาด'),
+          title: const Text('สุ่มสำเร็จ'),
           content: Text(message),
           actions: <Widget>[
             TextButton(

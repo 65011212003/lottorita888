@@ -166,26 +166,13 @@ class _SearchPageState extends State<SearchPage> {
                     color: Colors.amber)),
             const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text('งวดวันที่ 16 สิงหาคม 2567',
-                    style: TextStyle(fontSize: 16)),
                 GestureDetector(
                   onTap: _clearSearch,
                   child: const Text('ล้างค่า',
                       style: TextStyle(color: Colors.red, fontSize: 16)),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildCategoryButton('ทั้งหมด', isSelected: selectedCategory == 'ทั้งหมด')),
-                const SizedBox(width: 8),
-                Expanded(child: _buildCategoryButton('หวยเดี่ยว', isSelected: selectedCategory == 'หวยเดี่ยว')),
-                const SizedBox(width: 8),
-                Expanded(child: _buildCategoryButton('หวยชุด', isSelected: selectedCategory == 'หวยชุด')),
               ],
             ),
             const SizedBox(height: 16),

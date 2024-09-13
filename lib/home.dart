@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/search.dart';
-import 'services/api_service.dart';
+import 'package:lottorita888/services/api_service.dart';
 import 'reward.dart';
 import 'safe.dart';
 
@@ -45,7 +45,8 @@ class _HomePageState extends State<HomePage> {
     try {
       final fetchedLotteries = await ApiService.getLotteries(
         skip: currentPage * itemsPerPage,
-        limit: itemsPerPage, filter: '',
+        limit: itemsPerPage,
+        filter: '',
       );
       setState(() {
         if (loadMore) {
@@ -434,10 +435,22 @@ class _HomePageState extends State<HomePage> {
                             Navigator.of(context).pop();
                             // Update the lottery status and refresh the UI
                             updateLotteryStatus(lottery['id']);
+                            // Show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Lottery purchased successfully!'))
+                            );
+                            // Refresh user data
+                            fetchUserData();
                           }
                         } catch (e) {
+                          String errorMessage = 'Failed to purchase lottery';
+                          if (e.toString().contains('Insufficient funds')) {
+                            errorMessage = 'Insufficient funds to purchase lottery';
+                          } else if (e.toString().contains('Lottery not found')) {
+                            errorMessage = 'This lottery is no longer available';
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to purchase lottery: $e')),
+                            SnackBar(content: Text(errorMessage)),
                           );
                         }
                       },
@@ -454,34 +467,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBottomNavBar() {
-  return Container(
-    color: Colors.amber,
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildNavItem(Icons.calendar_today, 'หวย', () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
-          );
-        }),
-        _buildNavItem(Icons.emoji_events, 'รางวัล', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
-          );
-        }),
-        _buildNavItem(Icons.person, 'บัญชี', () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
-          );
-        }),
-      ],
-    ),
-  );
-}
+    return Container(
+      color: Colors.amber,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.calendar_today, 'หวย', () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+            );
+          }),
+          _buildNavItem(Icons.emoji_events, 'รางวัล', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
+            );
+          }),
+          _buildNavItem(Icons.person, 'บัญชี', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
+            );
+          }),
+        ],
+      ),
+    );
+  }
 
   Widget _buildNavItem(IconData icon, String label, VoidCallback? onTap) {
     return GestureDetector(

@@ -243,7 +243,6 @@ class _SafePageState extends State<SafePage>
               children: [
                 _buildHeader(),
                 _buildTitle(),
-                _buildDateDisplay(),
                 Expanded(
                   child: _buildLotteryList(),
                 ),
@@ -333,21 +332,6 @@ class _SafePageState extends State<SafePage>
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDateDisplay() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const Text(
-        'งวดวันที่ 16 สิงหาคม 2567',
-        style: TextStyle(
-            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
       ),
     );
   }
