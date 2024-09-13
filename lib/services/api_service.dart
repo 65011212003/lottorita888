@@ -298,4 +298,17 @@ static Future<Map<String, dynamic>> login(String email, String password) async {
       throw Exception('Failed to get all draws info: ${response.body}');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> users = jsonDecode(response.body);
+      return users.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to get all users: ${response.body}');
+    }
+  }
 }
