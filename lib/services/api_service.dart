@@ -4,42 +4,80 @@ import 'dart:convert';
 class ApiService {
   static const String baseUrl = 'https://docker-lotto-pma.onrender.com';
 
+  // static Future<Map<String, dynamic>> register(
+  //     String username, String password, int wallet) async {
+  //   final response = await http.post(
+  //     Uri.parse('$baseUrl/register/'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'username': username,
+  //       'password': password,
+  //       'wallet': wallet,
+  //     }),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     return jsonDecode(response.body) as Map<String, dynamic>;
+  //   } else {
+  //     throw Exception('Failed to register: ${response.body}');
+  //   }
+  // }
+
+  // static Future<Map<String, dynamic>> login(
+  //     String username, String password) async {
+  //   final response = await http.post(
+  //     Uri.parse('$baseUrl/login/'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'username': username,
+  //       'password': password,
+  //     }),
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     return jsonDecode(response.body) as Map<String, dynamic>;
+  //   } else {
+  //     throw Exception('Failed to login: ${response.body}');
+  //   }
+  // }
+
+
   static Future<Map<String, dynamic>> register(
-      String username, String password, int wallet) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/register/'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-        'wallet': wallet,
-      }),
-    );
+    String username, String email, String password, int wallet) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/register/'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'username': username,
+      'email': email,
+      'password': password,
+      'wallet': wallet,
+    }),
+  );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to register: ${response.body}');
-    }
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  } else {
+    throw Exception('Failed to register: ${response.body}');
   }
+}
 
-  static Future<Map<String, dynamic>> login(
-      String username, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/login/'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-    );
+static Future<Map<String, dynamic>> login(String email, String password) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/login/'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'password': password,
+    }),
+  );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to login: ${response.body}');
-    }
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  } else {
+    throw Exception('Failed to login: ${response.body}');
   }
+}
 
   static Future<List<Map<String, dynamic>>> getLotteries(
       {int skip = 0, int limit = 100, required String filter}) async {
