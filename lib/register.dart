@@ -230,10 +230,6 @@
 //   }
 // }
 
-
-
-
-
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../services/api_service.dart';
@@ -327,8 +323,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'LOTTORITA 69',
                           style: TextStyle(
                             fontSize: 36,
-                            fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontFamily: 'Abel',
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -337,6 +333,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
+                            fontFamily: 'Kanit',
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -354,60 +351,213 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 'สมัครสมาชิก',
                                 style: TextStyle(
                                   fontSize: 24,
-                                  fontWeight: FontWeight.bold,
                                   color: Colors.black87,
+                                  fontFamily: 'Kanit',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 20),
-                              _buildTextField(
-                                'ชื่อผู้ใช้',
-                                _usernameController,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildTextField(
-                                'อีเมล',
-                                _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildTextField(
-                                'Wallet',
-                                _walletController,
-                                keyboardType: TextInputType.number,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildTextField(
-                                'รหัสผ่าน',
-                                _passwordController,
-                                isPassword: true,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildTextField(
-                                'ยืนยันรหัสผ่าน',
-                                _confirmPasswordController,
-                                isPassword: true,
-                              ),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                onPressed: _isLoading ? null : _register,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber,
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                              const SizedBox(height: 5),
+                              Transform.translate(
+                                offset: const Offset(
+                                    25.0, 0.0), // ขยับไปทางขวา 8 หน่วย
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'ชื่อผู้ใช้',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Kanit',
+                                    ),
                                   ),
                                 ),
-                                child: _isLoading
-                                    ? const CircularProgressIndicator()
-                                    : const Text(
-                                        'สมัคร',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                child: TextField(
+                                  controller: _usernameController,
+                                  decoration: const InputDecoration(
+                                    border:
+                                        InputBorder.none, // ลบขอบใน TextField
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 10.0), // Padding ภายในกล่อง
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Transform.translate(
+                                offset: const Offset(
+                                    25.0, 0.0), // ขยับไปทางขวา 8 หน่วย
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'อีเมล',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Kanit',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                child: TextField(
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: const InputDecoration(
+                                    border:
+                                        InputBorder.none, // ลบขอบใน TextField
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 10.0), // Padding ภายในกล่อง
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Transform.translate(
+                                offset: const Offset(
+                                    25.0, 0.0), // ขยับไปทางขวา 8 หน่วย
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'wallet',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Kanit',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                child: TextField(
+                                  controller: _walletController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    border:
+                                        InputBorder.none, // ลบขอบใน TextField
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 10.0), // Padding ภายในกล่อง
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Transform.translate(
+                                offset: const Offset(
+                                    25.0, 0.0), // ขยับไปทางขวา 8 หน่วย
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'รหัสผ่าน',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Kanit',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                child: TextField(
+                                  controller: _passwordController,
+                                  obscureText: true,
+                                  decoration: const InputDecoration(
+                                    border:
+                                        InputBorder.none, // ลบขอบใน TextField
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 10.0), // Padding ภายในกล่อง
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Transform.translate(
+                                offset: const Offset(
+                                    25.0, 0.0), // ขยับไปทางขวา 8 หน่วย
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'ยืนยันรหัสผ่าน',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Kanit',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                child: TextField(
+                                  controller: _confirmPasswordController,
+                                  obscureText: true,
+                                  decoration: const InputDecoration(
+                                    border:
+                                        InputBorder.none, // ลบขอบใน TextField
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 10.0), // Padding ภายในกล่อง
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFE0AA3E), // สีจากขอบซ้าย
+                                      Color(0xFFF7EF8A), // สีตรงกลาง
+                                      Color(0xFFE0AA3E), // สีขอบขวา
+                                    ],
+                                    stops: [
+                                      0.0,
+                                      0.5,
+                                      1.0
+                                    ], // ไล่สีจากซ้าย กลาง ขวา
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+
+                                  borderRadius: BorderRadius.circular(
+                                      8.0), // ให้ขอบมนเล็กน้อย
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _isLoading ? null : _register,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors
+                                        .transparent, // ทำให้ background โปร่งใสเพื่อให้เห็น gradient
+                                    shadowColor: Colors.transparent, // ลบเงาออก
+                                  ),
+                                  child: _isLoading
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                          'สมัคร',
+                                          style: TextStyle(
+                                            fontFamily: 'Kanit',
+                                            color: Colors.black, // สีตัวอักษร
+                                          ),
                                         ),
-                                      ),
+                                ),
                               ),
                               const SizedBox(height: 10),
                               TextButton(
@@ -454,7 +604,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[600]),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {

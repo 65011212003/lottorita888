@@ -108,9 +108,9 @@ class _HomePageState extends State<HomePage> {
               _buildTitle(),
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 0),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withOpacity(0.30),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -160,11 +160,15 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet, color: Colors.amber, size: 20),
+                const Icon(Icons.account_balance_wallet,
+                    color: Colors.amber, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   '${userData['wallet'] ?? 0}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -181,13 +185,22 @@ class _HomePageState extends State<HomePage> {
         children: [
           Text('LOTTORITA 69',
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold)),
+                color: Colors.white,
+                fontSize: 37,
+                fontFamily: 'Abel',
+              )),
           Text('ชุดใหญ่ โอนไว จัดเต็ม พร้อมมิติ',
-              style: TextStyle(color: Colors.white, fontSize: 18)),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontFamily: 'Kanit',
+              )),
           Text('อันดีต ปัจจุบัน อนาคตครบ',
-              style: TextStyle(color: Colors.white, fontSize: 14)),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Kanit',
+              )),
         ],
       ),
     );
@@ -211,14 +224,18 @@ class _HomePageState extends State<HomePage> {
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Kanit',
+                ),
               ),
             ),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(userId: widget.userId)),
+                  MaterialPageRoute(
+                      builder: (context) => SearchPage(userId: widget.userId)),
                 );
               },
               child: Container(
@@ -366,7 +383,8 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         const Text(
                           'ยืนยันการซื้อ',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
@@ -386,9 +404,11 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               lottery['number'].toString(),
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
                             ),
-                            const Text('Lottorita 888', style: TextStyle(color: Colors.black54)),
+                            const Text('Lottorita 888',
+                                style: TextStyle(color: Colors.black54)),
                           ],
                         ),
                       ),
@@ -398,7 +418,9 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Credit'),
-                        Text('${userData['wallet']}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${userData['wallet']}.-',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const Row(
@@ -413,7 +435,9 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('ยอดคงเหลือ'),
-                        Text('${userData['wallet'] - 100}.-', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${userData['wallet'] - 100}.-',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -427,8 +451,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () async {
                         try {
-                          final result = await ApiService.buyLottery(int.parse(widget.userId), lottery['id']);
-                          if (result['message'] == 'Lottery purchased successfully') {
+                          final result = await ApiService.buyLottery(
+                              int.parse(widget.userId), lottery['id']);
+                          if (result['message'] ==
+                              'Lottery purchased successfully') {
                             setState(() {
                               userData['wallet'] -= 100;
                             });
@@ -437,24 +463,30 @@ class _HomePageState extends State<HomePage> {
                             updateLotteryStatus(lottery['id']);
                             // Show success message
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Lottery purchased successfully!'))
-                            );
+                                const SnackBar(
+                                    content: Text(
+                                        'Lottery purchased successfully!')));
                             // Refresh user data
                             fetchUserData();
                           }
                         } catch (e) {
                           String errorMessage = 'Failed to purchase lottery';
                           if (e.toString().contains('Insufficient funds')) {
-                            errorMessage = 'Insufficient funds to purchase lottery';
-                          } else if (e.toString().contains('Lottery not found')) {
-                            errorMessage = 'This lottery is no longer available';
+                            errorMessage =
+                                'Insufficient funds to purchase lottery';
+                          } else if (e
+                              .toString()
+                              .contains('Lottery not found')) {
+                            errorMessage =
+                                'This lottery is no longer available';
                           }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(errorMessage)),
                           );
                         }
                       },
-                      child: const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
+                      child:
+                          const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
                     ),
                   ],
                 ),
@@ -468,7 +500,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBottomNavBar() {
     return Container(
-      color: Colors.amber,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -476,19 +520,25 @@ class _HomePageState extends State<HomePage> {
           _buildNavItem(Icons.calendar_today, 'หวย', () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
+              MaterialPageRoute(
+                builder: (context) => HomePage(userId: widget.userId),
+              ),
             );
           }),
           _buildNavItem(Icons.emoji_events, 'รางวัล', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
+              MaterialPageRoute(
+                builder: (context) => RewardPage(userId: widget.userId),
+              ),
             );
           }),
           _buildNavItem(Icons.person, 'บัญชี', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
+              MaterialPageRoute(
+                builder: (context) => SafePage(userId: widget.userId),
+              ),
             );
           }),
         ],
