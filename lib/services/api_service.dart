@@ -143,23 +143,42 @@ static Future<Map<String, dynamic>> login(String email, String password) async {
     }
   }
 
-  static Future<Map<String, dynamic>> editProfile(
-      int userId, String newUsername, String newPassword) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/edit_profile/$userId/'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': newUsername,
-        'password': newPassword,
-      }),
-    );
+  // static Future<Map<String, dynamic>> editProfile(
+  //     int userId, String newUsername, String newPassword) async {
+  //   final response = await http.put(
+  //     Uri.parse('$baseUrl/edit_profile/$userId/'),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'username': newUsername,
+  //       'password': newPassword,
+  //     }),
+  //   );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to edit profile: ${response.body}');
-    }
+  //   if (response.statusCode == 200) {
+  //     return jsonDecode(response.body) as Map<String, dynamic>;
+  //   } else {
+  //     throw Exception('Failed to edit profile: ${response.body}');
+  //   }
+  // }
+
+  static Future<Map<String, dynamic>> editProfile(
+    int userId, String newUsername, String newEmail, String newPassword) async {
+  final response = await http.put(
+    Uri.parse('$baseUrl/edit_profile/$userId/'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'username': newUsername,
+      'email': newEmail,
+      'password': newPassword,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  } else {
+    throw Exception('Failed to edit profile: ${response.body}');
   }
+}
 
   static Future<Map<String, dynamic>> getUser(int userId) async {
     final response = await http.get(
