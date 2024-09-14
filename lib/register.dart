@@ -57,7 +57,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _usernameController.text,
             _emailController.text,
             _passwordController.text,
-            int.parse(_walletController.text),
           );
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
@@ -140,8 +139,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               _buildTextField('ชื่อผู้ใช้', _usernameController),
                               const SizedBox(height: 10),
                               _buildTextField('อีเมล', _emailController, keyboardType: TextInputType.emailAddress),
-                              const SizedBox(height: 10),
-                              _buildTextField('wallet', _walletController, keyboardType: TextInputType.number),
                               const SizedBox(height: 10),
                               _buildTextField('รหัสผ่าน', _passwordController, isPassword: true),
                               const SizedBox(height: 10),
