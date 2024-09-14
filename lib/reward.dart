@@ -146,8 +146,19 @@ class _RewardPageState extends State<RewardPage> {
   Widget _buildRewardsList() {
     if (_drawsInfo.isEmpty) {
       return const Center(
-          child: Text('No lottery results available.',
-              style: TextStyle(color: Colors.white)));
+        child: Padding(
+          padding: EdgeInsets.all(16.0), // เพิ่ม padding รอบข้อความ
+          child: Text(
+            '*ยังไม่ออกงวดรางวัล โปรดติดตามรอ*',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Kanit',
+              fontSize: 18, // เพิ่มขนาดตัวอักษร
+            ),
+            textAlign: TextAlign.center, // ทำให้ข้อความอยู่กึ่งกลางในแนวนอน
+          ),
+        ),
+      );
     }
 
     final latestDraw = _drawsInfo[0];

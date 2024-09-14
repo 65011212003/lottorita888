@@ -193,7 +193,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                   ),
                   child: isLoading
                       ? CircularProgressIndicator(color: Colors.white)
-                      : const Text('บัดตึงๆ',
+                      : const Text('บิดตึงๆ',
                           style: TextStyle(color: Colors.white)),
                 ),
               ],
