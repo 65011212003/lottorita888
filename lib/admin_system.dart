@@ -12,11 +12,14 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
   bool isLoading = false;
   List<Map<String, dynamic>> lotteries = [];
   String currentFilter = 'all'; // 'all', 'sold', or 'unsold'
+  int defaultWallet = 0;
+  TextEditingController defaultWalletController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchLotteries();
+    fetchDefaultWallet();
   }
 
   @override
@@ -106,6 +109,28 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                             color: Colors.white, fontFamily: 'Kanit')),
               ),
             ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: defaultWalletController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Default Wallet',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _updateDefaultWallet,
+                  child: Text('Update'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text('Current Default Wallet: $defaultWallet'),
           ],
         ),
       ),
@@ -279,12 +304,12 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
       decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-              Color(0xFFE0AA3E), // สีตรงกลาง
               Color(0xFFF7EF8A),
-              Color(0xFFE0AA3E), // สีที่ขอบขวา
+              Color(0xFFE0AA3E),
+              Color(0xFFF7EF8A),
+              Color(0xFFE0AA3E),
             ],
-            stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+            stops: [0.0, 0.5, 1.5, 2.5],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
@@ -313,8 +338,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                 decoration: BoxDecoration(
                   color: isSold ? Colors.green : Colors.red,
                   borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(10), // มุมล่างซ้าย
-                  ), // มุมโค้งทั้งหมด
+                    topRight: Radius.circular(10),
+                  ),
                 ),
                 child: Icon(
                   isSold ? Icons.person : Icons.close,
@@ -329,8 +354,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             decoration: const BoxDecoration(
               color: Colors.black54,
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10), // มุมล่างซ้าย
-                bottomRight: Radius.circular(10), // มุมล่างขวา
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
             ),
             child: Text(
@@ -349,12 +374,12 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-            Color(0xFFE0AA3E), // สีตรงกลาง
             Color(0xFFF7EF8A),
-            Color(0xFFE0AA3E), // สีที่ขอบขวา
+            Color(0xFFE0AA3E),
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E),
           ],
-          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          stops: [0.0, 0.5, 1.5, 2.5],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -437,6 +462,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
 
   void _refreshData() {
     fetchLotteries();
+    fetchDefaultWallet();
   }
 
   Future<void> fetchLotteries() async {
@@ -447,7 +473,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
       final fetchedLotteries = await ApiService.getLotteries(
         skip: 0,
         limit: 100,
-        filter: 'all', // เราจะดึงข้อมูลทั้งหมดมาก่อน
+        filter: 'all',
       );
       setState(() {
         if (currentFilter == 'all') {
@@ -461,8 +487,7 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
               .where((lottery) => lottery['is_sold'] != true)
               .toList();
         }
-        totalLotteries = fetchedLotteries
-            .length; // จำนวนทั้งหมดยังคงเป็นจำนวนทั้งหมดที่มีในระบบ
+        totalLotteries = fetchedLotteries.length;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -480,5 +505,34 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
       currentFilter = filter;
     });
     fetchLotteries();
+  }
+
+  Future<void> fetchDefaultWallet() async {
+    try {
+      final result = await ApiService.queryDefaultWallet(5); // Assuming admin_id is 1
+      setState(() {
+        defaultWallet = result['default_wallet'];
+        defaultWalletController.text = defaultWallet.toString();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching default wallet: $e')),
+      );
+    }
+  }
+
+  Future<void> _updateDefaultWallet() async {
+    try {
+      int newDefaultWallet = int.parse(defaultWalletController.text);
+      final result = await ApiService.updateDefaultWallet(5, newDefaultWallet); // Assuming admin_id is 1
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+      fetchDefaultWallet();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating default wallet: $e')),
+      );
+    }
   }
 }
