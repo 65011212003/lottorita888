@@ -42,8 +42,25 @@ class ApiService {
   // }
 
 
+  static Future<Map<String, dynamic>> updateDefaultWallet(int adminId, int defaultWallet) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/admin/update_default_wallet?admin_id=$adminId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'default_wallet': defaultWallet,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to update default wallet: ${response.body}');
+    }
+  }
+
+
   static Future<Map<String, dynamic>> register(
-    String username, String email, String password, int wallet) async {
+    String username, String email, String password) async {
   final response = await http.post(
     Uri.parse('$baseUrl/register/'),
     headers: {'Content-Type': 'application/json'},
@@ -51,7 +68,6 @@ class ApiService {
       'username': username,
       'email': email,
       'password': password,
-      'wallet': wallet,
     }),
   );
 
