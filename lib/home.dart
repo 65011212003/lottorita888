@@ -334,13 +334,15 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    lottery['number'].toString(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Abel',
-                      color: Colors.black,
-                      letterSpacing: 22.0,
+                  child: Center(
+                    child: Text(
+                      lottery['number'].toString(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontFamily: 'Abel',
+                        color: Colors.black,
+                        letterSpacing: 22.0,
+                      ),
                     ),
                   ),
                 ),
@@ -375,7 +377,7 @@ class _HomePageState extends State<HomePage> {
             ),
             child: const Text(
               'Price: 100',
-              textAlign: TextAlign.center, // จัดข้อความให้ตรงกลาง
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Abel',

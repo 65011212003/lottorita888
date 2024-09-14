@@ -322,73 +322,80 @@ class _SearchPageState extends State<SearchPage> {
       return Container(); // Return an empty container for sold lotteries
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFFAE8625), // AE8625
-              Color(0xFFF7EF8A), // F7EF8A
-              Color(0xFFD2AC47), // D2AC47
-              Color(0xFFEDC967), // EDC967
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFAE8625),
+            Color(0xFFF7EF8A),
+            Color(0xFFD2AC47),
+            Color(0xFFEDC967),
           ],
+          stops: [0.0, 0.33, 0.66, 1.0], // ปรับค่า stops ให้เหมาะสม
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(lottery['number'].toString(),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontFamily: 'Abel',
-                          color: Colors.black,
-                          letterSpacing: 20.0,
-                        )),
-                    const Text('Price: 100',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontFamily: 'Abel',
-                        )),
-                  ],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text(
+                      lottery['number'].toString(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontFamily: 'Abel',
+                        color: Colors.black,
+                        letterSpacing: 22.0,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                _showPurchaseConfirmationDialog(lottery);
-              },
-              child: Container(
-                height: 87,
+              Container(
+                width: 50,
+                height: 70,
                 decoration: const BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
                   ),
                 ),
-                padding: const EdgeInsets.all(16),
-                child: const Icon(Icons.shopping_cart, color: Colors.yellow),
+                child: GestureDetector(
+                  onTap: () {
+                    _showPurchaseConfirmationDialog(lottery);
+                  },
+                  child: const Icon(Icons.shopping_cart, color: Colors.yellow),
+                ),
+              ),
+            ],
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: const BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
             ),
-          ],
-        ),
+            child: const Text(
+              'Price: 100',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Abel',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
