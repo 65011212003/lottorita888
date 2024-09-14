@@ -116,16 +116,47 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                   child: TextField(
                     controller: defaultWalletController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Default Wallet',
                       border: OutlineInputBorder(),
+                      labelStyle: TextStyle(fontFamily: 'Kanit'),
                     ),
+                    style: TextStyle(fontFamily: 'Kanit'),
                   ),
                 ),
                 SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _updateDefaultWallet,
-                  child: Text('Update'),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFE0AA3E),
+                        Color(0xFFF7EF8A),
+                        Color(0xFFE0AA3E),
+                      ],
+                      stops: [0.0, 0.5, 1.0],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _updateDefaultWallet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text(
+                      'Update',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Kanit',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -509,7 +540,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
 
   Future<void> fetchDefaultWallet() async {
     try {
-      final result = await ApiService.queryDefaultWallet(5); // Assuming admin_id is 1
+      final result =
+          await ApiService.queryDefaultWallet(5); // Assuming admin_id is 1
       setState(() {
         defaultWallet = result['default_wallet'];
         defaultWalletController.text = defaultWallet.toString();
@@ -524,7 +556,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
   Future<void> _updateDefaultWallet() async {
     try {
       int newDefaultWallet = int.parse(defaultWalletController.text);
-      final result = await ApiService.updateDefaultWallet(5, newDefaultWallet); // Assuming admin_id is 1
+      final result = await ApiService.updateDefaultWallet(
+          5, newDefaultWallet); // Assuming admin_id is 1
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'])),
       );

@@ -463,40 +463,83 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   }
 
   Future<void> _drawLottery() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    try {
-      final newDraw = await ApiService.drawLottery();
-      setState(() {
-        _latestDraw = newDraw as Map<String, dynamic>?;
-        _allDrawsInfo.insert(0, newDraw as Map<String, dynamic>);
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      String errorMessage = 'ไม่สามารถสุ่มรางวัลได้';
-      if (e is Exception) {
-        errorMessage += ': ${e.toString()}';
-      }
-      _showErrorDialog(errorMessage);
+  try {
+    final newDraw = await ApiService.drawLottery();
+    setState(() {
+      _latestDraw = newDraw as Map<String, dynamic>?;
+      _allDrawsInfo.insert(0, newDraw as Map<String, dynamic>);
+      _isLoading = false;
+    });
+  } catch (e) {
+    String errorMessage = 'สุ่มรางวัลได้สำเร็จ';
+    if (e is Exception) {
+      errorMessage += ': ${e.toString()}';
     }
+    _showErrorDialog(errorMessage);
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('สุ่มสำเร็จ'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('ตกลง'),
-              onPressed: () => Navigator.of(context).pop(),
+void _showErrorDialog(String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        title: const Text(
+          'สุ่มสำเร็จ',
+          style: TextStyle(
+            fontFamily: 'Kanit',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontFamily: 'Kanit',
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFFE0AA3E),
+                  Color(0xFFF7EF8A),
+                  Color(0xFFE0AA3E),
+                ],
+                stops: [0.0, 0.5, 1.0],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(8.0),
             ),
-          ],
-        );
-      },
-    );
-  }
+            child: TextButton(
+              child: const Text(
+                'ตกลง',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Kanit',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 }

@@ -300,14 +300,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 20),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
-                                TextButton(
-                                  child: const Text('ลืมรหัสผ่าน'),
-                                  onPressed: () {
-                                    // Forgot password logic
-                                  },
-                                ),
                                 TextButton(
                                   style: ButtonStyle(
                                     backgroundColor:
