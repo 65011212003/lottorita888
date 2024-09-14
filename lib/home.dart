@@ -340,7 +340,7 @@ class _HomePageState extends State<HomePage> {
                       fontSize: 24,
                       fontFamily: 'Abel',
                       color: Colors.black,
-                      letterSpacing: 30.0,
+                      letterSpacing: 22.0,
                     ),
                   ),
                 ),

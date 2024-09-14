@@ -359,7 +359,7 @@ class _SearchPageState extends State<SearchPage> {
                           fontSize: 24,
                           fontFamily: 'Abel',
                           color: Colors.black,
-                          letterSpacing: 25.0,
+                          letterSpacing: 20.0,
                         )),
                     const Text('Price: 100',
                         style: TextStyle(
