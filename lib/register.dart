@@ -17,6 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _walletController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -140,9 +142,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               const SizedBox(height: 10),
                               _buildTextField('อีเมล', _emailController, keyboardType: TextInputType.emailAddress),
                               const SizedBox(height: 10),
-                              _buildTextField('รหัสผ่าน', _passwordController, isPassword: true),
+                              _buildTextField('รหัสผ่าน', _passwordController, isPassword: true, obscureText: _obscurePassword, onToggleVisibility: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              }),
                               const SizedBox(height: 10),
-                              _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController, isPassword: true),
+                              _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController, isPassword: true, obscureText: _obscureConfirmPassword, onToggleVisibility: () {
+                                setState(() {
+                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                });
+                              }),
                               const SizedBox(height: 20),
                               Container(
                                 decoration: BoxDecoration(
@@ -205,6 +215,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     TextEditingController controller, {
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,14 +239,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           child: TextFormField(
             controller: controller,
-            obscureText: isPassword,
+            obscureText: isPassword ? obscureText : false,
             keyboardType: keyboardType,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 vertical: 10.0,
                 horizontal: 10.0,
               ),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        obscureText ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: onToggleVisibility,
+                    )
+                  : null,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
