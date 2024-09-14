@@ -223,12 +223,12 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-            Color(0xFFE0AA3E), // สีตรงกลาง
-            Color(0xFFF7EF8A),
-            Color(0xFFE0AA3E), // สีที่ขอบขวา
+            Color(0xFFAE8625), // สีที่ 1
+            Color(0xFFF7EF8A), // สีที่ 2
+            Color(0xFFD2AC47), // สีที่ 3
+            Color(0xFFEDC967), // สีที่ 4
           ],
-          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          stops: [0.0, 0.33, 0.67, 1.0], // จุดที่สีเริ่มต้นและสิ้นสุด
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -239,8 +239,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Kanit')),
           ),
           Container(
             width: double.infinity,
@@ -258,7 +260,8 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(prize, style: const TextStyle(fontSize: 16)),
+            child: Text(prize,
+                style: const TextStyle(fontSize: 16, fontFamily: 'Kanit')),
           ),
         ],
       ),
@@ -272,12 +275,12 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-            Color(0xFFE0AA3E), // สีตรงกลาง
-            Color(0xFFF7EF8A),
-            Color(0xFFE0AA3E), // สีที่ขอบขวา
+            Color(0xFFAE8625), // สีที่ 1
+            Color(0xFFF7EF8A), // สีที่ 2
+            Color(0xFFD2AC47), // สีที่ 3
+            Color(0xFFEDC967), // สีที่ 4
           ],
-          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          stops: [0.0, 0.33, 0.67, 1.0], // จุดที่สีเริ่มต้นและสิ้นสุด
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -288,8 +291,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Kanit')),
           ),
           Container(
             width: double.infinity,
@@ -299,15 +304,17 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
               child: Text(
                 numbers,
                 style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 4),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 4,
+                ),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(prize, style: const TextStyle(fontSize: 14)),
+            child: Text(prize,
+                style: const TextStyle(fontSize: 14, fontFamily: 'Kanit')),
           ),
         ],
       ),
