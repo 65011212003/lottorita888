@@ -42,16 +42,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       try {
-        final result = await ApiService.register(
-          _usernameController.text,
-          _emailController.text,
-          _passwordController.text,
-          int.parse(_walletController.text),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
-        );
-        Navigator.pop(context);
+        // Fetch all users
+        List<Map<String, dynamic>> allUsers = await ApiService.getAllUsers();
+
+        // Check if email already exists
+        bool emailExists = allUsers.any((user) => user['email'] == _emailController.text);
+
+        if (emailExists) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น')),
+          );
+        } else {
+          final result = await ApiService.register(
+            _usernameController.text,
+            _emailController.text,
+            _passwordController.text,
+            int.parse(_walletController.text),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
+          );
+          Navigator.pop(context);
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('สมัครสมาชิกไม่สำเร็จ: $e')),
