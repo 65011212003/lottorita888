@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:lottorita888/home.dart';
+import 'package:lottorita888/profile.dart';
 import 'package:lottorita888/safe.dart';
 import 'package:lottorita888/services/api_service.dart';
 import 'package:intl/intl.dart';
@@ -86,7 +87,12 @@ class _RewardPageState extends State<RewardPage> {
         children: [
           GestureDetector(
             onTap: () {
-              // Navigate to profile page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(userId: widget.userId),
+                ),
+              );
             },
             child: CircleAvatar(
               backgroundColor: Colors.white,
