@@ -20,10 +20,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  final TextEditingController _depositAmountController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _depositAmountController = TextEditingController();
 
   Map<String, dynamic> userData = {};
   bool isLoading = true;
@@ -46,6 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _usernameController.text = user['username'] ?? '';
         _emailController.text = user['email'] ?? '';
         _passwordController.text = user['password'] ?? '';
+        _confirmPasswordController.text = user['password'] ?? '';
         isLoading = false;
       });
     } catch (e) {
@@ -75,8 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _passwordController.text,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('อัปเดตโปรไฟล์สำเร็จ: ${result['message'] ?? ''}')),
+        SnackBar(content: Text('อัปเดตโปรไฟล์สำเร็จ: ${result['message'] ?? ''}')),
       );
       fetchUserData();
     } catch (e) {
@@ -100,13 +98,11 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            int depositAmount =
-                int.tryParse(_depositAmountController.text) ?? 0;
+            int depositAmount = int.tryParse(_depositAmountController.text) ?? 0;
             int newBalance = currentWallet + depositAmount;
             return AlertDialog(
               contentPadding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               content: Container(
                 width: 300,
                 child: Column(
@@ -116,14 +112,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10)),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('ฝากไว ภายใน 0.1 วิ',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text('ฝากไว ภายใน 0.1 วิ', style: TextStyle(fontWeight: FontWeight.bold)),
                           InkWell(
                             onTap: () => Navigator.of(context).pop(),
                             child: const Icon(Icons.close, color: Colors.grey),
@@ -136,17 +130,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               color: Colors.amber,
                               borderRadius: BorderRadius.circular(25),
                             ),
                             child: Row(
                               children: [
-                                const Text('\$',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
+                                const Text('\$', style: TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: TextField(
@@ -201,9 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           });
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(
-                                    'ฝากเงินสำเร็จ: ${result['message']}')),
+                            SnackBar(content: Text('ฝากเงินสำเร็จ: ${result['message']}')),
                           );
                           fetchUserData(); // Refresh user data after deposit
                         } catch (e) {
@@ -218,14 +207,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: const BoxDecoration(
                           color: Colors.green,
-                          borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(10)),
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
                         ),
                         child: const Text(
                           'ฝาก',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -306,8 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.purple[100],
-            child: const Icon(Icons.person_outline,
-                size: 50, color: Colors.purple),
+            child: const Icon(Icons.person_outline, size: 50, color: Colors.purple),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -319,6 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildTextField('ชื่อผู้ใช้', _usernameController),
           _buildTextField('อีเมล', _emailController),
           _buildTextField('รหัสผ่าน', _passwordController, obscureText: true),
+          _buildTextField('ยืนยันรหัสผ่าน', _confirmPasswordController, obscureText: true),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -336,8 +323,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: ElevatedButton(
                   onPressed: _showDepositDialog,
                   style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color.fromARGB(255, 240, 217, 150)),
+                      backgroundColor: const Color.fromARGB(255, 240, 217, 150)),
                   child: const Text('ฝากเงิน'),
                 ),
               ),
@@ -354,8 +340,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool obscureText = false}) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool obscureText = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextField(
@@ -363,10 +348,8 @@ class _ProfilePageState extends State<ProfilePage> {
         obscureText: obscureText,
         decoration: InputDecoration(
           labelText: label,
-          hintText: obscureText ? '••••••' : null,
           border: const OutlineInputBorder(),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
       ),
     );
@@ -377,12 +360,12 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-            Color(0xFFE0AA3E), // สีตรงกลาง
             Color(0xFFF7EF8A),
-            Color(0xFFE0AA3E), // สีที่ขอบขวา
+            Color(0xFFE0AA3E),
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E),
           ],
-          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          stops: [0.0, 0.5, 1.5, 2.5],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -394,22 +377,19 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildNavItem(Icons.calendar_today, 'หวย', () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                  builder: (context) => HomePage(userId: widget.userId)),
+              MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
             );
           }),
           _buildNavItem(Icons.emoji_events, 'รางวัล', () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => RewardPage(userId: widget.userId)),
+              MaterialPageRoute(builder: (context) => RewardPage(userId: widget.userId)),
             );
           }),
           _buildNavItem(Icons.person, 'ตู้เซฟ', () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => SafePage(userId: widget.userId)),
+              MaterialPageRoute(builder: (context) => SafePage(userId: widget.userId)),
             );
           }),
         ],
