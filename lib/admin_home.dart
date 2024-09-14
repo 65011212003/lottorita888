@@ -247,7 +247,20 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            color: Colors.white,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFFAE8625), // สีที่ 1
+                  Color(0xFFF7EF8A), // สีที่ 2
+                  Color(0xFFD2AC47), // สีที่ 3
+                  Color(0xFFEDC967), // สีที่ 4
+                ],
+                stops: [0.0, 0.33, 0.67, 1.0], // จุดที่สีเริ่มต้นและสิ้นสุด
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Center(
               child: Text(
                 numbers,
@@ -259,10 +272,31 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(prize,
-                style: const TextStyle(fontSize: 16, fontFamily: 'Kanit')),
-          ),
+            padding: const EdgeInsets.all(0.0),
+            child: Container(
+              width: 1000,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6), // สีดำพร้อมความโปร่งแสง
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10), // มุมล่างซ้ายโค้ง 10 พิกเซล
+                  bottomRight: Radius.circular(10), // มุมล่างขวาโค้ง 10 พิกเซล
+                ),
+              ),
+              child: Center(
+                // ใช้ Center widget เพื่อจัดตำแหน่งข้อความตรงกลาง
+                child: Text(
+                  prize,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Kanit',
+                    color: Colors.white, // สีข้อความ
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -299,7 +333,20 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
-            color: Colors.white,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFFAE8625), // สีที่ 1
+                  Color(0xFFF7EF8A), // สีที่ 2
+                  Color(0xFFD2AC47), // สีที่ 3
+                  Color(0xFFEDC967), // สีที่ 4
+                ],
+                stops: [0.0, 0.33, 0.67, 1.0], // จุดที่สีเริ่มต้นและสิ้นสุด
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Center(
               child: Text(
                 numbers,
@@ -312,10 +359,31 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(prize,
-                style: const TextStyle(fontSize: 14, fontFamily: 'Kanit')),
-          ),
+            padding: const EdgeInsets.all(0.0),
+            child: Container(
+              width: 200,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6), // สีดำพร้อมความโปร่งแสง
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10), // มุมล่างซ้ายโค้ง 10 พิกเซล
+                  bottomRight: Radius.circular(10), // มุมล่างขวาโค้ง 10 พิกเซล
+                ),
+              ),
+              child: Center(
+                // ใช้ Center widget เพื่อจัดตำแหน่งข้อความตรงกลาง
+                child: Text(
+                  prize,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'Kanit',
+                    color: Colors.white, // สีข้อความ
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
