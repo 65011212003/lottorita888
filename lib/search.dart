@@ -112,7 +112,6 @@ class _SearchPageState extends State<SearchPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
@@ -634,7 +633,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             );
           }),
-          _buildNavItem(Icons.person, 'ตู้เซฟ', () {
+          _buildNavItem(Icons.account_balance_wallet, 'ตู้เซฟ', () {
             Navigator.push(
               context,
               MaterialPageRoute(

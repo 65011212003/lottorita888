@@ -590,7 +590,7 @@ class _SafePageState extends State<SafePage>
                   builder: (context) => RewardPage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(context, Icons.person, 'ตู้เซฟ', () {}),
+          _buildNavItem(context, Icons.account_balance_wallet, 'ตู้เซฟ', () {}),
         ],
       ),
     );
