@@ -240,11 +240,11 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFFAE8625), // สี AE8625
-                      Color(0xFFF7EF8A), // สี F7EF8A
+                      Color(0xFFAE8625),
+                      Color(0xFFF7EF8A),
                     ],
-                    begin: Alignment.topLeft, // จุดเริ่มต้นของ gradient
-                    end: Alignment.bottomRight, // จุดสิ้นสุดของ gradient
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildLotteryItem(Map<String, dynamic> lottery) {
     if (lottery['is_sold'] == true) {
-      return Container(); // Return an empty container for sold lotteries
+      return Container();
     }
 
     return Padding(
@@ -317,10 +317,10 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFAE8625), // AE8625
-              Color(0xFFF7EF8A), // F7EF8A
-              Color(0xFFD2AC47), // D2AC47
-              Color(0xFFEDC967), // EDC967
+              Color(0xFFAE8625),
+              Color(0xFFF7EF8A),
+              Color(0xFFD2AC47),
+              Color(0xFFEDC967),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -420,13 +420,13 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [
-                            Color(0xFFAE8625), // สี AE8625
-                            Color(0xFFF7EF8A), // สี F7EF8A
+                            Color(0xFFAE8625),
+                            Color(0xFFF7EF8A),
                           ],
-                          begin: Alignment.topLeft, // จุดเริ่มต้นของ gradient
-                          end: Alignment.bottomRight, // จุดสิ้นสุดของ gradient
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(10), // มุมโค้ง
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
                         child: Column(
@@ -482,24 +482,83 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       onPressed: () async {
-                        try {
-                          final result = await ApiService.buyLottery(
-                              int.parse(widget.userId), lottery['id']);
-                          if (result['message'] ==
-                              'Lottery purchased successfully') {
-                            setState(() {
-                              userData['wallet'] -= 100;
-                            });
-                            Navigator.of(context).pop();
-                            // Update the lottery status and refresh the UI
-                            updateLotteryStatus(lottery['id']);
-                          }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content:
-                                    Text('Failed to purchase lottery: $e')),
+                        if (userData['wallet'] < 100) {
+                          // Show insufficient balance warning
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                title: const Text(
+                                  'แจ้งเตือน',
+                                  style: TextStyle(
+                                    fontFamily: 'Kanit',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                content: const Text(
+                                  'เงินไม่เพียงพอ กรุณาเติมเงินในกระเป๋าของคุณก่อนทำการซื้อ',
+                                  style: TextStyle(
+                                    fontFamily: 'Kanit',
+                                  ),
+                                ),
+                                backgroundColor: Colors.white,
+                                elevation: 0,
+                                actions: <Widget>[
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFE0AA3E),
+                                          Color(0xFFF7EF8A),
+                                          Color(0xFFE0AA3E),
+                                        ],
+                                        stops: [0.0, 0.5, 1.0],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: TextButton(
+                                      child: const Text(
+                                        'ตกลง',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'Kanit',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
+                        } else {
+                          try {
+                            final result = await ApiService.buyLottery(
+                                int.parse(widget.userId), lottery['id']);
+                            if (result['message'] ==
+                                'Lottery purchased successfully') {
+                              setState(() {
+                                userData['wallet'] -= 100;
+                              });
+                              Navigator.of(context).pop();
+                              // Update the lottery status and refresh the UI
+                              updateLotteryStatus(lottery['id']);
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text('Failed to purchase lottery: $e')),
+                            );
+                          }
                         }
                       },
                       child: const Text('ยืนยัน',
@@ -523,12 +582,12 @@ class _HomePageState extends State<HomePage> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
-            Color(0xFFE0AA3E), // สีตรงกลาง
             Color(0xFFF7EF8A),
-            Color(0xFFE0AA3E), // สีที่ขอบขวา
+            Color(0xFFE0AA3E),
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E),
           ],
-          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          stops: [0.0, 0.5, 1.5, 2.5],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
