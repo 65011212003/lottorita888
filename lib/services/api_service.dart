@@ -41,59 +41,42 @@ class ApiService {
   //   }
   // }
 
-
-  static Future<Map<String, dynamic>> updateDefaultWallet(int adminId, int defaultWallet) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/admin/update_default_wallet?admin_id=$adminId'),
+  static Future<Map<String, dynamic>> register(
+      String username, String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/register/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'default_wallet': defaultWallet,
+        'username': username,
+        'email': email,
+        'password': password,
       }),
     );
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
-      throw Exception('Failed to update default wallet: ${response.body}');
+      throw Exception('Failed to register: ${response.body}');
     }
   }
 
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/login/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
+    );
 
-  static Future<Map<String, dynamic>> register(
-    String username, String email, String password) async {
-  final response = await http.post(
-    Uri.parse('$baseUrl/register/'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'username': username,
-      'email': email,
-      'password': password,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body) as Map<String, dynamic>;
-  } else {
-    throw Exception('Failed to register: ${response.body}');
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to login: ${response.body}');
+    }
   }
-}
-
-static Future<Map<String, dynamic>> login(String email, String password) async {
-  final response = await http.post(
-    Uri.parse('$baseUrl/login/'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'email': email,
-      'password': password,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body) as Map<String, dynamic>;
-  } else {
-    throw Exception('Failed to login: ${response.body}');
-  }
-}
 
   static Future<List<Map<String, dynamic>>> getLotteries(
       {int skip = 0, int limit = 100, required String filter}) async {
@@ -177,24 +160,24 @@ static Future<Map<String, dynamic>> login(String email, String password) async {
   //   }
   // }
 
-  static Future<Map<String, dynamic>> editProfile(
-    int userId, String newUsername, String newEmail, String newPassword) async {
-  final response = await http.put(
-    Uri.parse('$baseUrl/edit_profile/$userId/'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'username': newUsername,
-      'email': newEmail,
-      'password': newPassword,
-    }),
-  );
+  static Future<Map<String, dynamic>> editProfile(int userId,
+      String newUsername, String newEmail, String newPassword) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/edit_profile/$userId/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': newUsername,
+        'email': newEmail,
+        'password': newPassword,
+      }),
+    );
 
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body) as Map<String, dynamic>;
-  } else {
-    throw Exception('Failed to edit profile: ${response.body}');
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to edit profile: ${response.body}');
+    }
   }
-}
 
   static Future<Map<String, dynamic>> getUser(int userId) async {
     final response = await http.get(
@@ -238,7 +221,9 @@ static Future<Map<String, dynamic>> login(String email, String password) async {
         if (decodedResponse.containsKey('message')) {
           return {
             'message': decodedResponse['message'],
-            'lotteries': (decodedResponse['lotteries'] as List?)?.cast<Map<String, dynamic>>() ?? []
+            'lotteries': (decodedResponse['lotteries'] as List?)
+                    ?.cast<Map<String, dynamic>>() ??
+                []
           };
         }
       }
@@ -325,6 +310,36 @@ static Future<Map<String, dynamic>> login(String email, String password) async {
       return users.cast<Map<String, dynamic>>();
     } else {
       throw Exception('Failed to get all users: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> queryDefaultWallet(int adminId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/query_default_wallet?admin_id=$adminId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to query default wallet: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateDefaultWallet(
+      int adminId, int defaultWallet) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/admin/update_default_wallet?admin_id=$adminId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'default_wallet': defaultWallet,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to update default wallet: ${response.body}');
     }
   }
 }
