@@ -316,11 +316,12 @@ class _SafePageState extends State<SafePage>
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16.0),
       child: Text(
-        'ดูโพย',
+        'ตู้เซฟ',
         style: TextStyle(
           color: Colors.white,
           fontSize: 32,
           fontWeight: FontWeight.bold,
+          fontFamily: 'Kanit',
           shadows: [
             Shadow(
               blurRadius: 10.0,
@@ -412,13 +413,22 @@ class _SafePageState extends State<SafePage>
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         decoration: BoxDecoration(
-          color: isActive ? Colors.amber.shade300 : Colors.grey.shade300,
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFAE8625), // AE8625
+              Color(0xFFF7EF8A), // F7EF8A
+              Color(0xFFD2AC47), // D2AC47
+              Color(0xFFEDC967), // EDC967
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -445,7 +455,6 @@ class _SafePageState extends State<SafePage>
                       color: _getMessageColor(state),
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
                       ),
                     ),
                     padding: const EdgeInsets.symmetric(
@@ -463,8 +472,8 @@ class _SafePageState extends State<SafePage>
               ),
             ),
             Container(
-              width: 70,
-              height: 120,
+              width: 65,
+              height: 133,
               decoration: BoxDecoration(
                 color: _getStatusColor(state),
                 borderRadius: const BorderRadius.only(
@@ -473,15 +482,8 @@ class _SafePageState extends State<SafePage>
                 ),
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (state == 'lose')
-                    IconButton(
-                      icon: const Icon(Icons.close,
-                          color: Colors.white, size: 28),
-                      onPressed: () => deleteLottery(ticketId),
-                    ),
-                  if (state != 'lose') const SizedBox(height: 60),
                   _getStatusIcon(state, isClaimed, ticketId, number, prizeTier,
                       prizeAmount),
                 ],
@@ -544,7 +546,10 @@ class _SafePageState extends State<SafePage>
                   context, number, ticketId, prizeTier, prizeAmount),
         );
       case 'lose':
-        return const Icon(Icons.close, color: Colors.white);
+        return IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => deleteLottery(ticketId),
+        );
       case 'waiting':
         return const Icon(Icons.access_time, color: Colors.white);
       default:
@@ -554,7 +559,19 @@ class _SafePageState extends State<SafePage>
 
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      color: Colors.amber,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -573,7 +590,7 @@ class _SafePageState extends State<SafePage>
                   builder: (context) => RewardPage(userId: widget.userId)),
             );
           }),
-          _buildNavItem(context, Icons.person, 'บัญชี', () {}),
+          _buildNavItem(context, Icons.person, 'ตู้เซฟ', () {}),
         ],
       ),
     );
@@ -604,33 +621,56 @@ class _SafePageState extends State<SafePage>
           ),
           child: Container(
             width: 300,
+            height: 250,
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   'ขึ้นรางวัล',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Kanit'),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.amber,
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFAE8625), // AE8625
+                        Color(0xFFF7EF8A), // F7EF8A
+                        Color(0xFFD2AC47), // D2AC47
+                        Color(0xFFEDC967), // EDC967
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
                       Text(
                         'เลขที่ถูกรางวัล: $number',
                         style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Kanit'),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'รางวัลที่ได้: ${prizeTier ?? 'Unknown'}',
-                        style: const TextStyle(fontSize: 16),
+                        style:
+                            const TextStyle(fontSize: 16, fontFamily: 'Kanit'),
                       ),
                     ],
                   ),

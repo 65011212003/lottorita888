@@ -60,24 +60,37 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('สุ่มตัวเลข', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('สุ่มตัวเลข',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 GestureDetector(
                   onTap: () => showCustomDialog(context),
-                  child: Text('ล้างทั้งหมด', style: TextStyle(color: Colors.red[700], fontSize: 14)),
+                  child: Text('ล้างทั้งหมด',
+                      style: TextStyle(
+                          color: Colors.red[700],
+                          fontSize: 14,
+                          fontFamily: 'Kanit')),
                 ),
               ],
             ),
             const SizedBox(height: 4),
             Row(
               children: [
-                Text('Lotto ในระบบตอนนี้ ทั้งหมด ', style: TextStyle(fontSize: 14)),
-                Text('$totalLotteries', style: TextStyle(fontSize: 14, color: Colors.amber)),
-                Text(' ใบ', style: TextStyle(fontSize: 14)),
+                const Text('Lotto ในระบบตอนนี้ ทั้งหมด ',
+                    style: TextStyle(fontSize: 14, fontFamily: 'Kanit')),
+                Text('$totalLotteries',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.amber,
+                        fontFamily: 'Kanit')),
+                const Text(' ใบ',
+                    style: TextStyle(fontSize: 14, fontFamily: 'Kanit')),
               ],
             ),
             const SizedBox(height: 12),
             SizedBox(
-              width: double.infinity,
+              width: 500,
+              height: 60,
               child: ElevatedButton(
                 onPressed: isLoading ? null : _generateNewLotteries,
                 style: ElevatedButton.styleFrom(
@@ -88,7 +101,9 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                 ),
                 child: isLoading
                     ? CircularProgressIndicator(color: Colors.white)
-                    : const Text('สุ่มตัวเลข', style: TextStyle(color: Colors.white)),
+                    : const Text('สุ่มตัวเลข',
+                        style: TextStyle(
+                            color: Colors.white, fontFamily: 'Kanit')),
               ),
             ),
           ],
@@ -121,7 +136,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                           color: Colors.yellow,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close, color: Colors.black, size: 24),
+                        child: const Icon(Icons.close,
+                            color: Colors.black, size: 24),
                       ),
                     ),
                   ],
@@ -152,7 +168,8 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                   ),
                   child: isLoading
                       ? CircularProgressIndicator(color: Colors.white)
-                      : const Text('บัดดิ้งๆ', style: TextStyle(color: Colors.white)),
+                      : const Text('บัดตึงๆ',
+                          style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
@@ -186,12 +203,18 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             child: ElevatedButton(
               onPressed: () => _changeFilter('all'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: currentFilter == 'all' ? Colors.amber : Colors.white38,
+                backgroundColor: currentFilter == 'all'
+                    ? const Color.fromARGB(255, 255, 255, 255)
+                    : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('ทั้งหมด', style: TextStyle(color: currentFilter == 'all' ? Colors.black : Colors.white)),
+              child: Text('ทั้งหมด',
+                  style: TextStyle(
+                      color: currentFilter == 'all'
+                          ? Colors.black
+                          : Colors.white)),
             ),
           ),
           const SizedBox(width: 8),
@@ -199,12 +222,18 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             child: ElevatedButton(
               onPressed: () => _changeFilter('sold'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: currentFilter == 'sold' ? Colors.amber : Colors.white38,
+                backgroundColor: currentFilter == 'sold'
+                    ? const Color.fromARGB(255, 255, 255, 255)
+                    : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('ขายแล้ว', style: TextStyle(color: currentFilter == 'sold' ? Colors.black : Colors.white)),
+              child: Text('ขายแล้ว',
+                  style: TextStyle(
+                      color: currentFilter == 'sold'
+                          ? const Color.fromARGB(255, 0, 0, 0)
+                          : Colors.white)),
             ),
           ),
           const SizedBox(width: 8),
@@ -212,12 +241,18 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
             child: ElevatedButton(
               onPressed: () => _changeFilter('unsold'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: currentFilter == 'unsold' ? Colors.amber : Colors.white38,
+                backgroundColor: currentFilter == 'unsold'
+                    ? const Color.fromARGB(255, 247, 247, 247)
+                    : Colors.white38,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('ยังไม่ขาย', style: TextStyle(color: currentFilter == 'unsold' ? Colors.black : Colors.white)),
+              child: Text('ยังไม่ขาย',
+                  style: TextStyle(
+                      color: currentFilter == 'unsold'
+                          ? Colors.black
+                          : Colors.white)),
             ),
           ),
         ],
@@ -242,9 +277,18 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.amber,
-        borderRadius: BorderRadius.circular(8),
-      ),
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+              Color(0xFFE0AA3E), // สีตรงกลาง
+              Color(0xFFF7EF8A),
+              Color(0xFFE0AA3E), // สีที่ขอบขวา
+            ],
+            stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
           Row(
@@ -254,28 +298,47 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
                   padding: const EdgeInsets.all(12),
                   child: Text(
                     lottery['number'] ?? '',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Kanit',
+                      letterSpacing: 10.0,
+                    ),
                   ),
                 ),
               ),
               Container(
                 width: 50,
-                height: 50,
-                color: isSold ? Colors.green : Colors.red,
-                child: Icon(isSold ? Icons.person : Icons.close, color: Colors.white),
-              ),
+                height: 70,
+                decoration: BoxDecoration(
+                  color: isSold ? Colors.green : Colors.red,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(10), // มุมล่างซ้าย
+                  ), // มุมโค้งทั้งหมด
+                ),
+                child: Icon(
+                  isSold ? Icons.person : Icons.close,
+                  color: Colors.white,
+                ),
+              )
             ],
           ),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 4),
-            color: Colors.black54,
+            decoration: const BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10), // มุมล่างซ้าย
+                bottomRight: Radius.circular(10), // มุมล่างขวา
+              ),
+            ),
             child: Text(
               isSold ? 'ขายแล้ว' : 'ยังไม่ขาย',
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white),
             ),
-          ),
+          )
         ],
       ),
     );
@@ -283,7 +346,19 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
 
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      color: Colors.amber,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
@@ -378,11 +453,16 @@ class _SystemAdminPageState extends State<SystemAdminPage> {
         if (currentFilter == 'all') {
           lotteries = fetchedLotteries;
         } else if (currentFilter == 'sold') {
-          lotteries = fetchedLotteries.where((lottery) => lottery['is_sold'] == true).toList();
+          lotteries = fetchedLotteries
+              .where((lottery) => lottery['is_sold'] == true)
+              .toList();
         } else if (currentFilter == 'unsold') {
-          lotteries = fetchedLotteries.where((lottery) => lottery['is_sold'] != true).toList();
+          lotteries = fetchedLotteries
+              .where((lottery) => lottery['is_sold'] != true)
+              .toList();
         }
-        totalLotteries = fetchedLotteries.length; // จำนวนทั้งหมดยังคงเป็นจำนวนทั้งหมดที่มีในระบบ
+        totalLotteries = fetchedLotteries
+            .length; // จำนวนทั้งหมดยังคงเป็นจำนวนทั้งหมดที่มีในระบบ
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

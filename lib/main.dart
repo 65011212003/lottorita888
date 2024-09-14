@@ -68,60 +68,60 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       // Show alert dialog instead of snackbar
       showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      title: const Text(
-        'แจ้งเตือน',
-        style: TextStyle(
-          fontFamily: 'Kanit',
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      content: const Text(
-        'อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
-        style: TextStyle(
-          fontFamily: 'Kanit',
-        ),
-      ),
-      backgroundColor: Colors.white,
-      elevation: 0,
-      actions: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFFE0AA3E),
-                Color(0xFFF7EF8A),
-                Color(0xFFE0AA3E),
-              ],
-              stops: [0.0, 0.5, 1.0],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: TextButton(
-            child: const Text(
-              'ตกลง',
+            title: const Text(
+              'แจ้งเตือน',
               style: TextStyle(
-                color: Colors.black,
                 fontFamily: 'Kanit',
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
-      ],
-    );
-  },
-);
+            content: const Text(
+              'อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง',
+              style: TextStyle(
+                fontFamily: 'Kanit',
+              ),
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            actions: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFE0AA3E),
+                      Color(0xFFF7EF8A),
+                      Color(0xFFE0AA3E),
+                    ],
+                    stops: [0.0, 0.5, 1.0],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: TextButton(
+                  child: const Text(
+                    'ตกลง',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Kanit',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -283,7 +283,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 15),
                                 ),
                                 child: _isLoading
                                     ? const CircularProgressIndicator(
@@ -310,18 +311,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                 TextButton(
                                   style: ButtonStyle(
                                     backgroundColor:
-                                        MaterialStateProperty.all<Color>(
+                                        WidgetStateProperty.all<Color>(
                                             Colors.white),
                                     padding:
-                                        MaterialStateProperty.all<EdgeInsets>(
+                                        WidgetStateProperty.all<EdgeInsets>(
                                       const EdgeInsets.symmetric(
                                         vertical: 10.0,
                                         horizontal: 20.0,
                                       ),
                                     ),
-                                    minimumSize:
-                                        MaterialStateProperty.all<Size>(
-                                            const Size(100, 40)),
+                                    minimumSize: WidgetStateProperty.all<Size>(
+                                        const Size(100, 40)),
                                   ),
                                   child: const Text(
                                     'สมัครสมาชิก',

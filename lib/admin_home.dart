@@ -34,7 +34,8 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      _showErrorDialog('ไม่สามารถดึงข้อมูลการออกรางวัลทั้งหมดได้: ${e.toString()}');
+      _showErrorDialog(
+          'ไม่สามารถดึงข้อมูลการออกรางวัลทั้งหมดได้: ${e.toString()}');
     }
   }
 
@@ -58,7 +59,9 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
                   onRefresh: _fetchAllDrawsInfo,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    child: _showAllDraws ? _buildAllDrawsInfo() : _buildRewardsList(),
+                    child: _showAllDraws
+                        ? _buildAllDrawsInfo()
+                        : _buildRewardsList(),
                   ),
                 ),
               ),
@@ -83,7 +86,8 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
                 child: const Text('A', style: TextStyle(color: Colors.black)),
               ),
               const SizedBox(width: 8),
-              const Text('Admin', style: TextStyle(color: Colors.white, fontSize: 18)),
+              const Text('Admin',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
             ],
           ),
           ElevatedButton(
@@ -125,7 +129,9 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     }
 
     if (_allDrawsInfo.isEmpty) {
-      return const Center(child: Text('ยังไม่มีข้อมูลการออกรางวัล', style: TextStyle(color: Colors.white)));
+      return const Center(
+          child: Text('ยังไม่มีข้อมูลการออกรางวัล',
+              style: TextStyle(color: Colors.white)));
     }
 
     return ListView.builder(
@@ -150,8 +156,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
               final ticket = draw['winning_tickets'][index];
               return ListTile(
                 title: Text('เลขที่ถูกรางวัล: ${ticket['number']}'),
-                subtitle: Text('รางวัลที่ ${ticket['prize_tier']}: ${ticket['prize_amount']} บาท'),
-                trailing: Text(ticket['is_claimed'] ? 'รับรางวัลแล้ว' : 'ยังไม่รับรางวัล'),
+                subtitle: Text(
+                    'รางวัลที่ ${ticket['prize_tier']}: ${ticket['prize_amount']} บาท'),
+                trailing: Text(
+                    ticket['is_claimed'] ? 'รับรางวัลแล้ว' : 'ยังไม่รับรางวัล'),
               );
             },
           ),
@@ -164,15 +172,20 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     return Column(
       children: [
         _buildDateDisplay(),
-        _buildRewardCard('รางวัลที่ 1', _getWinnerNumber(0), 'รางวัล 1,000,000 บาท'),
-        _buildRewardCard('รางวัลที่ 2', _getWinnerNumber(1), 'รางวัล 50,000 บาท'),
-        _buildRewardCard('รางวัลที่ 3', _getWinnerNumber(2), 'รางวัล 25,000 บาท'),
+        _buildRewardCard(
+            'รางวัลที่ 1', _getWinnerNumber(0), 'รางวัล 1,000,000 บาท'),
+        _buildRewardCard(
+            'รางวัลที่ 2', _getWinnerNumber(1), 'รางวัล 50,000 บาท'),
+        _buildRewardCard(
+            'รางวัลที่ 3', _getWinnerNumber(2), 'รางวัล 25,000 บาท'),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSmallRewardCard('รางวัลที่ 4', _getWinnerNumber(3), 'รางวัล 5,000 บาท'),
+            _buildSmallRewardCard(
+                'รางวัลที่ 4', _getWinnerNumber(3), 'รางวัล 5,000 บาท'),
             const SizedBox(width: 10),
-            _buildSmallRewardCard('รางวัลที่ 5', _getWinnerNumber(4), 'รางวัล 1,000 บาท'),
+            _buildSmallRewardCard(
+                'รางวัลที่ 5', _getWinnerNumber(4), 'รางวัล 1,000 บาท'),
           ],
         ),
         const SizedBox(height: 16),
@@ -185,7 +198,9 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
-        _latestDraw != null ? 'งวดวันที่ ${_latestDraw!['draw_date']}' : 'ยังไม่มีการออกรางวัล',
+        _latestDraw != null
+            ? 'งวดวันที่ ${_latestDraw!['draw_date']}'
+            : 'ยังไม่มีการออกรางวัล',
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
@@ -196,7 +211,8 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       return 'X X X X X X';
     }
     final winningTickets = _latestDraw!['winning_tickets'] as List<dynamic>;
-    return (winningTickets.length > index && winningTickets[index]['number'] != null)
+    return (winningTickets.length > index &&
+            winningTickets[index]['number'] != null)
         ? winningTickets[index]['number']
         : 'X X X X X X';
   }
@@ -206,9 +222,15 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(10),
       ),
@@ -216,7 +238,9 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(title,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           Container(
             width: double.infinity,
@@ -225,7 +249,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
             child: Center(
               child: Text(
                 numbers,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8),
+                style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 8),
               ),
             ),
           ),
@@ -244,9 +271,15 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(10),
       ),
@@ -254,7 +287,9 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
           Container(
             width: double.infinity,
@@ -263,7 +298,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
             child: Center(
               child: Text(
                 numbers,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 4),
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4),
               ),
             ),
           ),
@@ -279,7 +317,7 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
   Widget _buildRandomButton() {
     return ElevatedButton.icon(
       onPressed: _isLoading ? null : _drawLottery,
-      icon: _isLoading 
+      icon: _isLoading
           ? const SizedBox(
               width: 24,
               height: 24,
@@ -287,9 +325,10 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
               ),
-            ) 
+            )
           : const Icon(Icons.refresh, color: Colors.black),
-      label: Text(_isLoading ? 'กำลังสุ่ม...' : 'สุ่มรางวัล', style: const TextStyle(color: Colors.black)),
+      label: Text(_isLoading ? 'กำลังสุ่ม...' : 'สุ่มรางวัล',
+          style: const TextStyle(color: Colors.black)),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFA500),
         shape: RoundedRectangleBorder(
@@ -302,7 +341,19 @@ class _LotteryAdminPageState extends State<LotteryAdminPage> {
 
   Widget _buildBottomNavBar() {
     return Container(
-      color: Colors.amber,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF7EF8A), // สีเริ่มต้นที่ขอบซ้าย
+            Color(0xFFE0AA3E), // สีตรงกลาง
+            Color(0xFFF7EF8A),
+            Color(0xFFE0AA3E), // สีที่ขอบขวา
+          ],
+          stops: [0.0, 0.5, 1.5, 2.5], // จุดที่สีเริ่มต้นและสิ้นสุด
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),

@@ -404,7 +404,9 @@ class _HomePageState extends State<HomePage> {
                         const Text(
                           'ยืนยันการซื้อ',
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Kanit'),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
@@ -416,8 +418,15 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(10),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFAE8625), // สี AE8625
+                            Color(0xFFF7EF8A), // สี F7EF8A
+                          ],
+                          begin: Alignment.topLeft, // จุดเริ่มต้นของ gradient
+                          end: Alignment.bottomRight, // จุดสิ้นสุดของ gradient
+                        ),
+                        borderRadius: BorderRadius.circular(10), // มุมโค้ง
                       ),
                       child: Center(
                         child: Column(
@@ -425,7 +434,10 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               lottery['number'].toString(),
                               style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 5.0,
+                                  fontFamily: 'Abel'),
                             ),
                             const Text('Lottorita 888',
                                 style: TextStyle(color: Colors.black54)),
@@ -481,32 +493,20 @@ class _HomePageState extends State<HomePage> {
                             Navigator.of(context).pop();
                             // Update the lottery status and refresh the UI
                             updateLotteryStatus(lottery['id']);
-                            // Show success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Lottery purchased successfully!')));
-                            // Refresh user data
-                            fetchUserData();
                           }
                         } catch (e) {
-                          String errorMessage = 'Failed to purchase lottery';
-                          if (e.toString().contains('Insufficient funds')) {
-                            errorMessage =
-                                'Insufficient funds to purchase lottery';
-                          } else if (e
-                              .toString()
-                              .contains('Lottery not found')) {
-                            errorMessage =
-                                'This lottery is no longer available';
-                          }
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(errorMessage)),
+                            SnackBar(
+                                content:
+                                    Text('Failed to purchase lottery: $e')),
                           );
                         }
                       },
-                      child:
-                          const Text('ยืนยัน', style: TextStyle(fontSize: 18)),
+                      child: const Text('ยืนยัน',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Kanit',
+                          )),
                     ),
                   ],
                 ),
@@ -553,7 +553,7 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           }),
-          _buildNavItem(Icons.person, 'บัญชี', () {
+          _buildNavItem(Icons.person, 'ตู้เซฟ', () {
             Navigator.push(
               context,
               MaterialPageRoute(
