@@ -634,7 +634,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             );
           }),
-          _buildNavItem(Icons.person, 'ตู้เซฟ', () {
+          _buildNavItem(Icons.account_balance_wallet, 'ตู้เซฟ', () {
             Navigator.push(
               context,
               MaterialPageRoute(

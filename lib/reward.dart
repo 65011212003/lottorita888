@@ -285,7 +285,7 @@ class _RewardPageState extends State<RewardPage> {
           _buildNavItem(context, Icons.emoji_events, 'รางวัล', () {
             // Already on the RewardPage, so no navigation needed
           }),
-          _buildNavItem(context, Icons.person, 'ตู้เซฟ', () {
+          _buildNavItem(context, Icons.account_balance_wallet, 'ตู้เซฟ', () {
             Navigator.push(
               context,
               MaterialPageRoute(
