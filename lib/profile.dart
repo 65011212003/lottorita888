@@ -284,9 +284,20 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(color: Colors.black),
             ),
           ),
-          Text(
-            '${(userData['wallet'] as num?)?.toInt() ?? 0}',
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+          Row(
+            children: [
+              const Icon(
+                Icons.account_balance_wallet,
+                color: Color.fromARGB(255, 246, 246, 246),
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${(userData['wallet'] as num?)?.toInt() ?? 0}',
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(width: 10),
+            ],
           ),
         ],
       ),
